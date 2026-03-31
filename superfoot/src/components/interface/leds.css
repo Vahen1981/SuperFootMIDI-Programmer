@@ -1,0 +1,120 @@
+.led-azul {
+    position: absolute;
+    background-image: url('../../assets/ledAzul.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    top: calc(var(--width) * 0.069);
+    width: calc(var(--width) * 0.0492);
+    height: calc(var(--width) * 0.0492);
+}
+
+.led-verde {
+    position: absolute;
+    width: calc(var(--width) * 0.0492);
+    height: calc(var(--width) * 0.0492);
+    background-image: url('../../assets/ledVerde.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.led-rojo {
+    position: absolute;
+    width: calc(var(--width) * 0.0492);
+    height: calc(var(--width) * 0.0492);
+    background-image: url('../../assets/ledRojo.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#led1 {
+    left: calc(var(--width) * 0.069);
+}
+
+#led2 {
+    left: calc(var(--width) * 0.098);
+}
+
+#led3 {
+    left: calc(var(--width) * 0.129);
+}
+
+#led4 {
+    left: calc(var(--width) * 0.159);
+}
+
+#led5 {
+    left: calc(var(--width) * 0.189);
+}
+
+#led6 {
+    left: calc(var(--width) * 0.219);
+}
+
+#led7 {
+    left: calc(var(--width) * 0.249);
+}
+
+#led8 {
+    left: calc(var(--width) * 0.279);
+}
+
+#led9 {
+    left: calc(var(--width) * 0.309);
+}
+
+#led10 {
+    left: calc(var(--width) * 0.339);
+}
+
+#ledA {
+    left: calc(var(--width) * 0.088);
+    top: calc(var(--width) * 0.137);
+}
+
+#ledB {
+    left: calc(var(--width) * 0.282);
+    top: calc(var(--width) * 0.137);
+}
+
+#ledC {
+    left: calc(var(--width) * 0.474);
+    top: calc(var(--width) * 0.137);
+}
+
+#ledD {
+    left: calc(var(--width) * 0.668);
+    top: calc(var(--width) * 0.137);
+}
+
+#ledE {
+    left: calc(var(--width) * 0.088);
+    top: calc(var(--width) * 0.32);
+}
+
+#ledF {
+    left: calc(var(--width) * 0.282);
+    top: calc(var(--width) * 0.32);
+}
+
+#ledG {
+    left: calc(var(--width) * 0.474);
+    top: calc(var(--width) * 0.32);
+}
+
+#ledH {
+    left: calc(var(--width) * 0.668);  
+    top: calc(var(--width) * 0.32);
+}
+
+#ledUp {
+    left: calc(var(--width) * 0.861);
+    top: calc(var(--width) * 0.137);
+}
+
+#ledDwn {
+    left: calc(var(--width) * 0.861); 
+    top: calc(var(--width) * 0.32);
+}

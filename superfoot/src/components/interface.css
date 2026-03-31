@@ -1,0 +1,154 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; /* opcional pero recomendado */
+}
+
+:root {
+  /* --width: 1419px; */
+  --width: 1200px;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.header {
+    width: var(--width);
+    height: 100px;
+    border: solid 1px red;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: 'Mouse Memoirs', cursive;
+}
+
+.header button,
+.header .bank-button {
+    padding: 12px 22px;
+    background: rgba(255, 255, 255, 0.23);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 30px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    font-family: 'Mouse Memoirs', cursive;
+}
+
+.header .bank-button {
+    margin-left: auto;
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+}
+
+.header .bank-button:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+.header .logo-image {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.header-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header-logo .logo-text {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 0 8px rgba(0,0,0,0.35);
+}
+
+.logo-image {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+}
+
+.header-logo {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 8px;
+}
+
+.header button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.header button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.header button:active {
+    transform: translateY(0);
+}
+
+.counter-display {
+    font-size: 18px;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-family: 'Mouse Memoirs', cursive;
+}
+
+#superfoot-img-container {
+    position: relative;
+    width: var(--width);
+    height: calc(var(--width) / 2);
+    background-image: url('../assets/superfoot-body.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: 0 auto;
+    padding: 0;
+    border: solid 1px red;
+    z-index: 0;
+}
+
+.led-hidden {
+    opacity: 0;
+    transition: opacity 0.15s ease-in-out;
+}
+
+.led-visible {
+    opacity: 1;
+    transition: opacity 0.15s ease-in-out;
+}
+
+.pedals-top,
+.pedals-bottom {
+    cursor: pointer;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.12s ease-in-out;
+}
+
+.pedal-hidden {
+    opacity: 0;
+}
+
+.pedal-visible {
+    opacity: 1;
+}
+
+

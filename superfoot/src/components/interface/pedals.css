@@ -1,0 +1,62 @@
+.pedals-top {
+    position: absolute;
+    width: calc(var(--width) * 0.0508);
+    height: calc(var(--width) * 0.0508);
+    background-image: url('../../assets/pedalPressed.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    top: calc(var(--width) * 0.178);
+}
+
+.pedals-bottom {
+    position: absolute;
+    width: calc(var(--width) * 0.0508);
+    height: calc(var(--width) * 0.0508);
+    background-image: url('../../assets/pedalPressed.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    top: calc(var(--width) * 0.359);
+}
+
+#pedalA {
+    left: calc(var(--width) * 0.087);
+}
+
+#pedalE {
+    left: calc(var(--width) * 0.087);
+}
+
+#pedalB {
+    left: calc(var(--width) * 0.281);
+}
+
+#pedalF {
+    left: calc(var(--width) * 0.281);
+}
+
+#pedalC {
+    left: calc(var(--width) * 0.475);
+}
+
+#pedalG {
+    left: calc(var(--width) * 0.475);
+}
+
+#pedalD {
+    left: calc(var(--width) * 0.668);
+}
+
+#pedalH {
+    left: calc(var(--width) * 0.668);
+}
+
+#pedalUp {
+    left: calc(var(--width) * 0.86);
+}
+
+#pedalDwn {
+    left: calc(var(--width) * 0.86);
+}
+

@@ -1,0 +1,141 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; /* opcional pero recomendado */
+}
+
+:root {
+  /* --width: 1419px; */
+    --width: calc((100vw / 4) * 3);
+    background-image: url('../../assets/cuero.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.header {
+    width: var(--width);
+    margin-top: 20px;
+    height: 180px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: 'Mouse Memoirs', cursive;
+}
+
+.header-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logo-image {
+    height: 180px;
+    width: auto;
+    object-fit: contain;
+}
+
+.bank-button {
+    width: 150px;
+    height: 50px;
+    padding: 10px 18px;
+    background: rgba(255, 181, 181, 0.23);
+    color: white;
+    border: 1px solid rgb(224, 0, 0);
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    font-family: 'Mouse Memoirs', cursive;
+    font-size: 24px;
+}
+
+.bank-button:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: translateY(-1px);
+}
+
+.header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-end;
+    border: 1px solid rgb(26, 26, 26);
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.397);
+    height: auto;
+    width: 300px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    padding-top: 20px;
+    gap: 6px;
+}
+
+.device-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.status-text {
+    color: #ffdddd;
+    font-size: 24px;
+    font-weight: 400;
+}
+
+.status-led {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}
+
+#superfoot-img-container {
+    position: relative;
+    width: var(--width);
+    height: calc(var(--width) / 2);
+    background-image: url('../../assets/superfoot-body.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: 0 auto;
+    padding: 0;
+    z-index: 0;
+}
+
+.led-hidden {
+    opacity: 0;
+    transition: opacity 0.15s ease-in-out;
+}
+
+.led-visible {
+    opacity: 1;
+    transition: opacity 0.15s ease-in-out;
+}
+
+.pedals-top,
+.pedals-bottom {
+    cursor: pointer;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.12s ease-in-out;
+}
+
+.pedal-hidden {
+    opacity: 0;
+}
+
+.pedal-visible {
+    opacity: 1;
+}
+
+
