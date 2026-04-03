@@ -8,6 +8,7 @@ import { banksData, presetsData } from '../../backend/datatransfer'
 import logo from '../../assets/logo.png'
 import ledRojo from '../../assets/ledRojo.png'
 import ledVerde from '../../assets/ledVerde.png'
+import { SAVE_DATA } from '../midiUtils.js'
 
 const REQUEST_DATA = 0x00
 const greenPedals = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
@@ -153,12 +154,22 @@ export const Interface = () => {
       return
     }
 
-    // Ejemplo de Sysex de Program (ajusta bytes según tu protocolo plataforma)
-    const programRequest = [0xF0, 0x74, 0x6F, 0x71, REQUEST_DATA, counter, 0x01, 0xF7]
+    const banksFlat = Array.from(banksData)
+    const presetsFlat = presetsData.flat(2)
+
+    const programRequest = [
+      0xF0, 0x74, 0x6F, 0x71, SAVE_DATA,
+      ...banksFlat,
+      ...presetsFlat,
+      0xF7
+    ]
 
     try {
       midiOutput.send(programRequest)
-      console.log('Program Sysex sent to SuperFoot MIDI:', programRequest)
+      console.log('Program Sysex sent to SuperFoot MIDI successfully!')
+      console.log('Payload array (dec):', programRequest)
+      const requestHex = programRequest.map((byte) => `0x${Number(byte).toString(16).toUpperCase().padStart(2, '0')}`)
+      console.log('Payload array (hex):', requestHex)
     } catch (error) {
       console.error('Error sending Program Sysex:', error)
     }
