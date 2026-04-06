@@ -1,6 +1,6 @@
 # SuperFoot MIDI Programmer
 
-Aplicación web (React + Vite) para configurar el pedalero **SuperFoot MIDI**: define el comportamiento de cada **banco** (10) y de cada **pedal** verde (A–H) por banco, y sincroniza la configuración con el hardware mediante **MIDI System Exclusive (SysEx)**.
+Aplicación web (React + Vite) para configurar el controlador **ToquiControl - SuperFoot MIDI**: define el comportamiento de cada **banco** (10) y de cada **pedal** (A–H) por banco, y sincroniza la configuración con el hardware mediante **MIDI System Exclusive (SysEx)**.
 
 ---
 
