@@ -15,6 +15,5 @@ import { BANK_TYPES } from '../data/factory.js'
 //7. Si el usuario hace click en "Guardar en dispositivo" se envía un sysex con toda la info de
 //   tempData al dispositivo, allí se procesa y se guarda.
 
-export const banksData = BANK_TYPES
-export const presetsData = FACTORY_SETTINGS
-
+export const banksData = [...BANK_TYPES]
+export const presetsData = JSON.parse(JSON.stringify(FACTORY_SETTINGS))

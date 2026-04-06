@@ -1,4 +1,5 @@
-export const SAVE_DATA = 0x01
+export const SAVE_DATA = 0x4A
+export const REQUEST_DATA = 0x40
 export const TYPE_PC = 0x0C
 export const TYPE_CC = 0x0B
 export const TYPE_NOTE = 0x09

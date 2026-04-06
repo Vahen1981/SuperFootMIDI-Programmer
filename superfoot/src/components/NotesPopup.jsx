@@ -1,8 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useId } from 'react'
+import './banktype.css'
 import { SAVE_DATA, TYPE_NOTE, GREEN_PEDALS, sendSysexRequest } from './midiUtils'
 import { presetsData } from '../backend/datatransfer'
+import { calculateChord, detectChord } from '../backend/chordcalculator.js'
 
-export const NotesPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput }) => {
+export const NotesPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput, onSetWarning }) => {
+  const rowId = useId()
   const [midiChannel, setMidiChannel] = useState(1)
   const [note1, setNote1] = useState('empty')
   const [note2, setNote2] = useState('empty')
@@ -12,6 +15,10 @@ export const NotesPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput }) =
   const [oct2, setOct2] = useState("3")
   const [oct3, setOct3] = useState("3")
   const [oct4, setOct4] = useState("3")
+  const [rootNote, setRootNote] = useState("C")
+  const [chordType, setChordType] = useState("major")
+  const [buildMethod, setBuildMethod] = useState("chordBuilder")
+  const [currentInfo, setCurrentInfo] = useState({ channel: 1, notes: [] })
 
   useEffect(() => {
     if (isOpen && bank && pedal) {
@@ -45,6 +52,17 @@ export const NotesPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput }) =
         setNote2(n2.note); setOct2(n2.oct)
         setNote3(n3.note); setOct3(n3.oct)
         setNote4(n4.note); setOct4(n4.oct)
+
+        const activeNotes = []
+        if (n1.note !== 'empty') activeNotes.push(`${n1.note}${n1.oct}`)
+        if (n2.note !== 'empty') activeNotes.push(`${n2.note}${n2.oct}`)
+        if (n3.note !== 'empty') activeNotes.push(`${n3.note}${n3.oct}`)
+        if (n4.note !== 'empty') activeNotes.push(`${n4.note}${n4.oct}`)
+        
+        setCurrentInfo({
+          channel: payload[1] + 1,
+          notes: activeNotes.length > 0 ? activeNotes : ['None']
+        })
       }
     }
   }, [isOpen, bank, pedal])
@@ -73,12 +91,14 @@ export const NotesPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput }) =
       return n + (o * 12)
     }
 
-    const rawNotes = [
-      noteNumber(note1, oct1),
-      noteNumber(note2, oct2),
-      noteNumber(note3, oct3),
-      noteNumber(note4, oct4),
-    ]
+    const rawNotes = buildMethod === 'chordBuilder'
+      ? calculateChord(rootNote, chordType)
+      : [
+          noteNumber(note1, oct1),
+          noteNumber(note2, oct2),
+          noteNumber(note3, oct3),
+          noteNumber(note4, oct4),
+        ]
     const selectedNotes = rawNotes.filter((n) => n >= 0)
     const noteCount = selectedNotes.length
     const paddedNotes = [...selectedNotes, ...Array(4 - noteCount).fill(0x7F)]
@@ -98,86 +118,175 @@ export const NotesPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput }) =
 
   const notes = ['empty', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
   const octaves = ['-2', '-1', '0', '1', '2', '3', '4', '5', '6', '7']
+  const rootNotes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+  const chordTypes = ['major', 'minor', 'dominant', 'minor7', 'major7', 'dim', 'half-diminished', 'diminished', 'augmented']
 
   return (
     <div className='banktype-overlay' onClick={onOverlayClick}>
       <div className='banktype-popup' onClick={onPopupClick}>
         <h2>{`Pedal ${pedal} - Bank ${bank}`}</h2>
-        <p style={{ opacity: 0.75, fontWeight: 500 }}><strong>Tipo de banco:</strong> {type}</p>
+        <p className='subtitle' style={{ paddingTop: '5px', borderTop: '1px solid #6b6b6bff', marginBottom: '20px', textAlign: 'right' }}>Sending: Single Note or Chords</p>
         
-        <div style={{ marginTop: '16px' }}>
-          <div style={{ marginBottom: '10px' }}>
-            <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>MIDI Channel (1-16)</label>
-            <select
-              value={midiChannel}
-              onChange={(e) => setMidiChannel(Number(e.target.value))}
-              style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc' }}
-            >
-              {Array.from({ length: 16 }, (_, i) => i + 1).map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
+        <div className='popup-fields'>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px',opacity: 1, marginBottom: '10px', border: '1px solid rgba(0, 0, 0, 0.1)', borderRadius: '12px', padding: '10px 20px 10px 20px', background: 'rgba(255, 255, 255, 0.5)'  }}>
+            <div className='popup-field-row' style={{ margin: 0, flex: '1 1 auto' }}>
+              <label htmlFor='notes-popup-midi-channel' style={{ whiteSpace: 'nowrap', flex: '0 0 auto', minWidth: 'auto', marginRight: '10px' }}>MIDI Channel</label>
+              <select
+                id='notes-popup-midi-channel'
+                className='popup-field-select'
+                value={midiChannel}
+                onChange={(e) => setMidiChannel(Number(e.target.value))}
+                style={{ flex: '0 1 80px' }}
+              >
+                {Array.from({ length: 16 }, (_, i) => i + 1).map((n) => (
+                  <option key={n} value={n}>{n}</option>
+                ))}
+              </select>
+            </div>
+
+            <div style={{ display: 'flex', gap: '20px', justifyContent: 'flex-end', flex: '0 0 auto' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                <input 
+                  type="radio" 
+                  name="buildMethod" 
+                  value="chordBuilder" 
+                  checked={buildMethod === 'chordBuilder'} 
+                  onChange={() => setBuildMethod('chordBuilder')} 
+                />
+                Chord Builder
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                <input 
+                  type="radio" 
+                  name="buildMethod" 
+                  value="noteByNote" 
+                  checked={buildMethod === 'noteByNote'} 
+                  onChange={() => setBuildMethod('noteByNote')} 
+                />
+                Note by Note
+              </label>
+            </div>
           </div>
 
-          {[1, 2, 3, 4].map((i) => {
-            const noteState = i === 1 ? note1 : i === 2 ? note2 : i === 3 ? note3 : note4
-            const setNoteState = i === 1 ? setNote1 : i === 2 ? setNote2 : i === 3 ? setNote3 : setNote4
-            const octState = i === 1 ? oct1 : i === 2 ? oct2 : i === 3 ? oct3 : oct4
-            const setOctState = i === 1 ? setOct1 : i === 2 ? setOct2 : i === 3 ? setOct3 : setOct4
-            const noteDisabled = i === 1 ? false : (i === 2 ? note1 === 'empty' : i === 3 ? note2 === 'empty' : note3 === 'empty')
-            const octaveDisabled = noteState === 'empty'
+          <div className='chord-builder-container' style={{ opacity: buildMethod !== 'chordBuilder' ? 0.5 : 1, marginBottom: '10px', border: '1px solid rgba(0, 0, 0, 0.1)', borderRadius: '12px', padding: '10px 20px 10px 20px', background: 'rgba(255, 255, 255, 0.5)' }}>
+            <div className='popup-note-row' style={{ flexWrap: 'nowrap', marginBottom: 0}}>
+              <label className='popup-note-label' style={{ flex: '0 0 auto', minWidth: '40px' }}>Root</label>
+              <select
+                className='popup-field-select--note'
+                value={rootNote}
+                style={{ flex: 1, minWidth: 0 }}
+                disabled={buildMethod !== 'chordBuilder'}
+                onChange={(e) => {
+                  const value = e.target.value
+                  setRootNote(value)
+                }}>
+                {rootNotes.map((n) => (
+                  <option key={n} value={n}>{n}</option>
+                ))}
+              </select>
+              <label className='popup-octave-label' style={{ flex: '0 0 auto', minWidth: 'auto', marginLeft: '5px' }}>Type</label>
+              <select
+                className='popup-field-select--note'
+                value={chordType}
+                style={{ flex: 1, minWidth: 0 }}
+                disabled={buildMethod !== 'chordBuilder'}
+                onChange={(e) => {
+                  const value = e.target.value
+                  setChordType(value)
+                }}>
+                {chordTypes.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+          </div>
 
-            return (
-              <div key={i} style={{ marginBottom: '10px' }}>
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                  <div style={{ flex: 1 }}>
-                    <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>Note {i}</label>
-                    <select
-                      value={noteState}
-                      disabled={noteDisabled}
-                      onChange={(e) => {
-                        const value = e.target.value
-                        setNoteState(value)
-                        if (i === 1 && value === 'empty') {
-                          setNote2('empty'); setOct2(0); setNote3('empty'); setOct3(0); setNote4('empty'); setOct4(0)
-                        }
-                        if (i === 2 && value === 'empty') {
-                          setNote3('empty'); setOct3(0); setNote4('empty'); setOct4(0)
-                        }
-                        if (i === 3 && value === 'empty') {
-                          setNote4('empty'); setOct4(0)
-                        }
-                      }}
-                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc' }}
-                    >
-                      {notes.map((n) => (
-                        <option key={n} value={n}>{n}</option>
-                      ))}
-                    </select>
-                  </div>
+          <div style={{ display: 'flex', gap: '20px', alignItems: 'stretch', flexWrap: 'wrap' }}>
+            <div style={{ flex: '1 1 250px', opacity: buildMethod !== 'noteByNote' ? 0.5 : 1, border: '1px solid rgba(0, 0, 0, 0.1)', borderRadius: '12px', padding: '20px', background: 'rgba(255, 255, 255, 0.5)' }}>
+              {[1, 2, 3, 4].map((i) => {
+              const noteState = i === 1 ? note1 : i === 2 ? note2 : i === 3 ? note3 : note4
+              const setNoteState = i === 1 ? setNote1 : i === 2 ? setNote2 : i === 3 ? setNote3 : setNote4
+              const octState = i === 1 ? oct1 : i === 2 ? oct2 : i === 3 ? oct3 : oct4
+              const setOctState = i === 1 ? setOct1 : i === 2 ? setOct2 : i === 3 ? setOct3 : setOct4
+              const noteDisabled = buildMethod !== 'noteByNote' || (i === 1 ? false : (i === 2 ? note1 === 'empty' : i === 3 ? note2 === 'empty' : note3 === 'empty'))
+              const octaveDisabled = buildMethod !== 'noteByNote' || noteState === 'empty'
+              const noteSelectId = `${rowId}-note-${i}`
+              const octSelectId = `${rowId}-oct-${i}`
 
-                  <div style={{ width: '120px' }}>
-                    <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>Octave</label>
-                    <select
-                      value={octState}
-                      disabled={octaveDisabled || (i !== 1 && noteDisabled)}
-                      onChange={(e) => setOctState(e.target.value)}
-                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc' }}
-                    >
-                      {octaves.map((o) => (
-                        <option key={o} value={o}>{o}</option>
-                      ))}
-                    </select>
-                  </div>
+              return (
+                <div key={i} className='popup-note-row' style={{ flexWrap: 'nowrap', justifyContent: 'flex-start' }}>
+                  <label className='popup-note-label' htmlFor={noteSelectId} style={{ flex: '0 0 auto', minWidth: 'auto' }}>Note {i}</label>
+                  <select
+                    id={noteSelectId}
+                    className='popup-field-select--note'
+                    // style={{ flex: '0 1 85px', minWidth: '85px' }}
+                    value={noteState}
+                    disabled={noteDisabled}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      setNoteState(value)
+                      if (i === 1 && value === 'empty') {
+                        setNote2('empty'); setOct2(0); setNote3('empty'); setOct3(0); setNote4('empty'); setOct4(0)
+                      }
+                      if (i === 2 && value === 'empty') {
+                        setNote3('empty'); setOct3(0); setNote4('empty'); setOct4(0)
+                      }
+                      if (i === 3 && value === 'empty') {
+                        setNote4('empty'); setOct4(0)
+                      }
+                    }}
+                  >
+                    {notes.map((n) => (
+                      <option key={n} value={n}>{n}</option>
+                    ))}
+                  </select>
+                  <label className='popup-octave-label' htmlFor={octSelectId} style={{ flex: '0 0 auto', minWidth: 'auto', marginLeft: '10px' }}>Octave</label>
+                  <select
+                    id={octSelectId}
+                    className='popup-field-select--octave'
+                    // style={{ flex: '0 1 65px', minWidth: '65px' }}
+                    value={octState}
+                    disabled={octaveDisabled || (i !== 1 && noteDisabled)}
+                    onChange={(e) => setOctState(e.target.value)}
+                  >
+                    {octaves.map((o) => (
+                      <option key={o} value={o}>{o}</option>
+                    ))}
+                  </select>
                 </div>
+              )})}
+            </div>
+
+            <div style={{ flex: '1 1 200px', border: '3px solid #3f3f3fff', borderRadius: '12px', padding: '20px', background: 'rgba(0, 0, 0, 1)', display: 'flex', flexDirection: 'column', justifyContent: 'center', boxShadow: '3px 3px 5px rgba(0, 0, 0, 0.5)' }}>
+              <p style={{ marginTop: 0, marginBottom: '15px', fontSize: '14px', fontWeight: '800',textAlign: 'center', color: '#007bff', borderBottom: '1px solid #007bff', paddingBottom: '10px' }}>Current Settings</p>
+              <div style={{ marginBottom: '10px', display: 'flex', justifyContent: 'left', alignItems: 'center'}}>
+                <p style={{ fontWeight: 600, color: '#007bff', marginRight: '10px'}}>Chord: </p>
+                <p style={{ background: '#007bff', padding: '3px 4px', borderRadius: '5px', fontSize: '14px', fontWeight: '800', width: '100%', textAlign: 'center' }}>{detectChord(currentInfo?.notes).replace('undetected', '-')}</p>
               </div>
-            )
-          })}
+              <div style={{ marginBottom: '10px', display: 'flex', justifyContent: 'left'}}>
+                <p style={{ fontWeight: 600, color: '#007bff', marginRight: '10px'}}>Bank:</p>
+                <p style={{ float: 'right', color: '#007bff', fontWeight: '800' }}>{bank}</p>
+              </div>
+              <div style={{ marginBottom: '10px', display: 'flex', justifyContent: 'left'}}>
+                <p style={{ fontWeight: 600, color: '#007bff', marginRight: '10px'}}>Pedal:</p>
+                <p style={{ float: 'right', color: '#007bff', fontWeight: '800' }}>{pedal}</p>
+              </div>
+              <div style={{ marginBottom: '10px', display: 'flex', justifyContent: 'left'}}>
+                <p style={{ fontWeight: 600, color: '#007bff', marginRight: '10px'}}>MIDI Channel:</p>
+                <p style={{ float: 'right', color: '#007bff', fontWeight: '800' }}>{currentInfo?.channel || '-'}</p>
+              </div>
+              <div style={{ marginBottom: '10px', display: 'flex', width: '100%', border: 'solid 1px rgba(0, 47, 100, 1)', borderRadius: '10px', justifyContent: 'center', padding: '10px 0'}}>
+                  {currentInfo?.notes?.map((n, idx) => (
+                    <span key={idx} style={{ background: '#007bff', padding: '3px 4px', borderRadius: '5px', fontSize: '14px', fontWeight: '800', margin: '0 5px' }}>{n}</span>
+                  ))}
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '18px', gap: '12px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between',  marginTop: '40px', gap: '12px' }}>
           <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={onClose}>Close</button>
-          <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={handleSet}>Set</button>
+          <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={() => onSetWarning ? onSetWarning(handleSet) : handleSet()}>Set</button>
         </div>
       </div>
     </div>

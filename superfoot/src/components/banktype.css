@@ -14,12 +14,27 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.subtitle {
+  color: #000000;
+  font-family: "Urbanist", sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  text-align: left;
 }
 
 .banktype-popup {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  font-family: "Urbanist", sans-serif;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.692);
   padding: 30px;
   border-radius: 20px;
   max-width: 600px;
@@ -27,8 +42,15 @@
   max-height: 80vh;
   overflow-y: auto;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-  border: 2px solid #e1e5e9;
+  border: 2px solid #000000;
   animation: slideIn 0.3s ease-out;
+}
+
+.banktype-popup select,
+.banktype-popup option,
+.banktype-popup input,
+.banktype-popup textarea {
+  font-family: 'Roboto', sans-serif;
 }
 
 @keyframes slideIn {
@@ -36,6 +58,7 @@
     transform: scale(0.9) translateY(-20px);
     opacity: 0;
   }
+
   to {
     transform: scale(1) translateY(0);
     opacity: 1;
@@ -46,11 +69,83 @@
   margin-top: 0;
   margin-bottom: 20px;
   text-align: center;
-  color: #333;
-  font-size: 28px;
+  color: #000000;
+  font-size: 32px;
   font-weight: 600;
   font-family: 'Mouse Memoirs', cursive;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.banktype-popup .popup-fields {
+  margin-top: 16px;
+}
+
+.banktype-popup .popup-field-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.banktype-popup .popup-field-row>label {
+  flex: 0 0 42%;
+  min-width: 11.5rem;
+  max-width: 50%;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #000;
+}
+
+.banktype-popup .popup-field-row>select.popup-field-select {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #fff;
+}
+
+.banktype-popup .popup-note-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.banktype-popup .popup-note-row .popup-note-label {
+  flex: 0 0 38%;
+  min-width: 4.5rem;
+  max-width: 46%;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #000;
+}
+
+.banktype-popup .popup-note-row select.popup-field-select--note {
+  flex: 0 1 55px;
+  min-width: 55px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #fff;
+}
+
+.banktype-popup .popup-note-row .popup-octave-label {
+  flex: 0 0 auto;
+  min-width: 4.25rem;
+  font-weight: 600;
+  color: #000;
+}
+
+.banktype-popup .popup-note-row select.popup-field-select--octave {
+  flex: 0 1 55px;
+  min-width: 55px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #fff;
 }
 
 .banktype-list {
@@ -62,8 +157,9 @@
 
 .banktype-item {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
   background: rgba(255, 255, 255, 0.8);
   padding: 15px;
   border-radius: 10px;
@@ -77,19 +173,24 @@
 }
 
 .banktype-item label {
+  flex: 0 0 auto;
+  min-width: 5.5rem;
   font-weight: 500;
-  color: #555;
+  color: #000000;
   font-size: 14px;
-  font-family: 'Mouse Memoirs', cursive;
+  font-family: 'Roboto', sans-serif;
 }
 
 .banktype-item select {
+  flex: 1;
+  min-width: 0;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 8px;
   background: white;
+  font-family: 'Roboto', sans-serif;
   font-size: 14px;
-  color: #333;
+  color: #000000;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
 }
@@ -113,7 +214,7 @@
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
-  font-family: 'Mouse Memoirs', cursive;
+  font-family: 'Roboto', sans-serif;
 }
 
 .banktype-popup button:hover {
@@ -139,4 +240,113 @@
   .banktype-popup h2 {
     font-size: 24px;
   }
+}
+
+.warning-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.warning-popup {
+  font-family: 'Roboto', sans-serif;
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  animation: slideIn 0.3s ease-out;
+  border-left: 5px solid #ff4757;
+}
+
+.warning-popup h3 {
+  margin-top: 0;
+  color: #ff4757;
+  font-size: 24px;
+  font-family: 'Mouse Memoirs', cursive;
+  margin-bottom: 15px;
+}
+
+.warning-popup p {
+  color: #555;
+  font-size: 16px;
+  margin-bottom: 25px;
+  line-height: 1.5;
+}
+
+.warning-popup .popup-warning-checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.warning-popup .popup-warning-checkbox-row label {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  cursor: pointer;
+  color: #555;
+  line-height: 1.4;
+}
+
+.warning-popup .popup-warning-checkbox-row input {
+  flex-shrink: 0;
+  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.warning-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.warning-actions button {
+  margin: 0;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 16px;
+  font-family: 'Roboto', sans-serif;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.warning-actions .confirm-btn {
+  background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
+  color: white;
+  box-shadow: 0 4px 8px rgba(255, 71, 87, 0.3);
+}
+
+.warning-actions .confirm-btn:hover {
+  background: linear-gradient(135deg, #ff6b81 0%, #ff4757 100%);
+  box-shadow: 0 6px 12px rgba(255, 71, 87, 0.4);
+  transform: translateY(-2px);
+}
+
+.warning-actions .cancel-btn {
+  background: #f1f2f6;
+  color: #333;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.warning-actions .cancel-btn:hover {
+  background: #dfe4ea;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
 }

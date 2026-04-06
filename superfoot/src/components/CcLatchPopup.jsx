@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
+import './banktype.css'
 import { SAVE_DATA, TYPE_CC, GREEN_PEDALS, LATCH, sendSysexRequest } from './midiUtils'
 import { presetsData } from '../backend/datatransfer'
 
-export const CcLatchPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput }) => {
+export const CcLatchPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput, onSetWarning }) => {
   const [midiChannel, setMidiChannel] = useState(1)
   const [ccLatchNumber, setCcLatchNumber] = useState(0)
 
@@ -43,15 +44,16 @@ export const CcLatchPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput })
     <div className='banktype-overlay' onClick={onOverlayClick}>
       <div className='banktype-popup' onClick={onPopupClick}>
         <h2>{`Pedal ${pedal} - Bank ${bank}`}</h2>
-        <p style={{ opacity: 0.75, fontWeight: 500 }}><strong>Tipo de banco:</strong> {type}</p>
+        <p className='subtitle' style={{ paddingTop: '5px', borderTop: '1px solid #6b6b6bff', marginBottom: '40px', textAlign: 'right' }}>Control Change (On/Off)</p>
         
-        <div style={{ marginTop: '16px' }}>
-          <div style={{ marginBottom: '10px' }}>
-            <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>MIDI Channel (1-16)</label>
+        <div className='popup-fields'>
+          <div className='popup-field-row'>
+            <label htmlFor='ccl-popup-midi-channel'>MIDI Channel (1-16)</label>
             <select
+              id='ccl-popup-midi-channel'
+              className='popup-field-select'
               value={midiChannel}
               onChange={(e) => setMidiChannel(Number(e.target.value))}
-              style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc' }}
             >
               {Array.from({ length: 16 }, (_, i) => i + 1).map((n) => (
                 <option key={n} value={n}>{n}</option>
@@ -59,12 +61,13 @@ export const CcLatchPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput })
             </select>
           </div>
 
-          <div style={{ marginBottom: '10px' }}>
-            <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>CC Latch Number (0-127)</label>
+          <div className='popup-field-row'>
+            <label htmlFor='ccl-popup-latch-number'>CC Latch Number (0-127)</label>
             <select
+              id='ccl-popup-latch-number'
+              className='popup-field-select'
               value={ccLatchNumber}
               onChange={(e) => setCcLatchNumber(Number(e.target.value))}
-              style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc' }}
             >
               {Array.from({ length: 128 }, (_, n) => n).map((n) => (
                 <option key={n} value={n}>{n}</option>
@@ -73,9 +76,9 @@ export const CcLatchPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput })
           </div>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '18px', gap: '12px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '50px', gap: '12px' }}>
           <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={onClose}>Close</button>
-          <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={handleSet}>Set</button>
+          <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={() => onSetWarning ? onSetWarning(handleSet) : handleSet()}>Set</button>
         </div>
       </div>
     </div>
