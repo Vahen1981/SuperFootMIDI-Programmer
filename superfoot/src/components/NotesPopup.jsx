@@ -3,8 +3,10 @@ import './banktype.css'
 import { SAVE_DATA, TYPE_NOTE, GREEN_PEDALS, sendSysexRequest } from './midiUtils'
 import { presetsData } from '../backend/datatransfer'
 import { calculateChord, detectChord } from '../backend/chordcalculator.js'
+import { useLanguage } from '../context/LanguageContext.jsx'
 
 export const NotesPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput, onSetWarning }) => {
+  const { t } = useLanguage()
   const rowId = useId()
   const [midiChannel, setMidiChannel] = useState(1)
   const [note1, setNote1] = useState('empty')
@@ -124,13 +126,13 @@ export const NotesPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput, onS
   return (
     <div className='banktype-overlay' onClick={onOverlayClick}>
       <div className='banktype-popup' onClick={onPopupClick}>
-        <h2>{`Pedal ${pedal} - Bank ${bank}`}</h2>
-        <p className='subtitle' style={{ paddingTop: '5px', borderTop: '1px solid #6b6b6bff', marginBottom: '20px', textAlign: 'right' }}>Sending: Single Note or Chords</p>
+        <h2>{`${t('popup.pedal')} ${pedal} - ${t('popup.bank')} ${bank}`}</h2>
+        <p className='subtitle' style={{ paddingTop: '5px', borderTop: '1px solid #6b6b6bff', marginBottom: '20px', textAlign: 'right' }}>{t('notes.title')}</p>
         
         <div className='popup-fields'>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px',opacity: 1, marginBottom: '10px', border: '1px solid rgba(0, 0, 0, 0.1)', borderRadius: '12px', padding: '10px 20px 10px 20px', background: 'rgba(255, 255, 255, 0.5)'  }}>
             <div className='popup-field-row' style={{ margin: 0, flex: '1 1 auto' }}>
-              <label htmlFor='notes-popup-midi-channel' style={{ whiteSpace: 'nowrap', flex: '0 0 auto', minWidth: 'auto', marginRight: '10px' }}>MIDI Channel</label>
+              <label htmlFor='notes-popup-midi-channel' style={{ whiteSpace: 'nowrap', flex: '0 0 auto', minWidth: 'auto', marginRight: '10px' }}>{t('popup.midiChannel')}</label>
               <select
                 id='notes-popup-midi-channel'
                 className='popup-field-select'
@@ -153,7 +155,7 @@ export const NotesPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput, onS
                   checked={buildMethod === 'chordBuilder'} 
                   onChange={() => setBuildMethod('chordBuilder')} 
                 />
-                Chord Builder
+                {t('notes.chordBuilder')}
               </label>
               <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                 <input 
@@ -163,14 +165,14 @@ export const NotesPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput, onS
                   checked={buildMethod === 'noteByNote'} 
                   onChange={() => setBuildMethod('noteByNote')} 
                 />
-                Note by Note
+                {t('notes.noteByNote')}
               </label>
             </div>
           </div>
 
           <div className='chord-builder-container' style={{ opacity: buildMethod !== 'chordBuilder' ? 0.5 : 1, marginBottom: '10px', border: '1px solid rgba(0, 0, 0, 0.1)', borderRadius: '12px', padding: '10px 20px 10px 20px', background: 'rgba(255, 255, 255, 0.5)' }}>
             <div className='popup-note-row' style={{ flexWrap: 'nowrap', marginBottom: 0}}>
-              <label className='popup-note-label' style={{ flex: '0 0 auto', minWidth: '40px' }}>Root</label>
+              <label className='popup-note-label' style={{ flex: '0 0 auto', minWidth: '40px' }}>{t('notes.root')}</label>
               <select
                 className='popup-field-select--note'
                 value={rootNote}
@@ -184,7 +186,7 @@ export const NotesPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput, onS
                   <option key={n} value={n}>{n}</option>
                 ))}
               </select>
-              <label className='popup-octave-label' style={{ flex: '0 0 auto', minWidth: 'auto', marginLeft: '5px' }}>Type</label>
+              <label className='popup-octave-label' style={{ flex: '0 0 auto', minWidth: 'auto', marginLeft: '5px' }}>{t('notes.type')}</label>
               <select
                 className='popup-field-select--note'
                 value={chordType}
@@ -215,7 +217,7 @@ export const NotesPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput, onS
 
               return (
                 <div key={i} className='popup-note-row' style={{ flexWrap: 'nowrap', justifyContent: 'flex-start' }}>
-                  <label className='popup-note-label' htmlFor={noteSelectId} style={{ flex: '0 0 auto', minWidth: 'auto' }}>Note {i}</label>
+                  <label className='popup-note-label' htmlFor={noteSelectId} style={{ flex: '0 0 auto', minWidth: 'auto' }}>{t('notes.note')} {i}</label>
                   <select
                     id={noteSelectId}
                     className='popup-field-select--note'
@@ -240,7 +242,7 @@ export const NotesPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput, onS
                       <option key={n} value={n}>{n}</option>
                     ))}
                   </select>
-                  <label className='popup-octave-label' htmlFor={octSelectId} style={{ flex: '0 0 auto', minWidth: 'auto', marginLeft: '10px' }}>Octave</label>
+                  <label className='popup-octave-label' htmlFor={octSelectId} style={{ flex: '0 0 auto', minWidth: 'auto', marginLeft: '10px' }}>{t('notes.octave')}</label>
                   <select
                     id={octSelectId}
                     className='popup-field-select--octave'
@@ -258,21 +260,21 @@ export const NotesPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput, onS
             </div>
 
             <div style={{ flex: '1 1 200px', border: '3px solid #3f3f3fff', borderRadius: '12px', padding: '20px', background: 'rgba(0, 0, 0, 1)', display: 'flex', flexDirection: 'column', justifyContent: 'center', boxShadow: '3px 3px 5px rgba(0, 0, 0, 0.5)' }}>
-              <p style={{ marginTop: 0, marginBottom: '15px', fontSize: '14px', fontWeight: '800',textAlign: 'center', color: '#007bff', borderBottom: '1px solid #007bff', paddingBottom: '10px' }}>Current Settings</p>
+              <p style={{ marginTop: 0, marginBottom: '15px', fontSize: '14px', fontWeight: '800',textAlign: 'center', color: '#007bff', borderBottom: '1px solid #007bff', paddingBottom: '10px' }}>{t('popup.currentSettings')}</p>
               <div style={{ marginBottom: '10px', display: 'flex', justifyContent: 'left', alignItems: 'center'}}>
-                <p style={{ fontWeight: 600, color: '#007bff', marginRight: '10px'}}>Chord: </p>
+                <p style={{ fontWeight: 600, color: '#007bff', marginRight: '10px'}}>{t('notes.chord')}: </p>
                 <p style={{ background: '#007bff', padding: '3px 4px', borderRadius: '5px', fontSize: '14px', fontWeight: '800', width: '100%', textAlign: 'center' }}>{detectChord(currentInfo?.notes).replace('undetected', '-')}</p>
               </div>
               <div style={{ marginBottom: '10px', display: 'flex', justifyContent: 'left'}}>
-                <p style={{ fontWeight: 600, color: '#007bff', marginRight: '10px'}}>Bank:</p>
+                <p style={{ fontWeight: 600, color: '#007bff', marginRight: '10px'}}>{t('popup.bank')}:</p>
                 <p style={{ float: 'right', color: '#007bff', fontWeight: '800' }}>{bank}</p>
               </div>
               <div style={{ marginBottom: '10px', display: 'flex', justifyContent: 'left'}}>
-                <p style={{ fontWeight: 600, color: '#007bff', marginRight: '10px'}}>Pedal:</p>
+                <p style={{ fontWeight: 600, color: '#007bff', marginRight: '10px'}}>{t('popup.pedal')}:</p>
                 <p style={{ float: 'right', color: '#007bff', fontWeight: '800' }}>{pedal}</p>
               </div>
               <div style={{ marginBottom: '10px', display: 'flex', justifyContent: 'left'}}>
-                <p style={{ fontWeight: 600, color: '#007bff', marginRight: '10px'}}>MIDI Channel:</p>
+                <p style={{ fontWeight: 600, color: '#007bff', marginRight: '10px'}}>{t('popup.midiChannel')}:</p>
                 <p style={{ float: 'right', color: '#007bff', fontWeight: '800' }}>{currentInfo?.channel || '-'}</p>
               </div>
               <div style={{ marginBottom: '10px', display: 'flex', width: '100%', border: 'solid 1px rgba(0, 47, 100, 1)', borderRadius: '10px', justifyContent: 'center', padding: '10px 0'}}>
@@ -285,8 +287,8 @@ export const NotesPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput, onS
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between',  marginTop: '40px', gap: '12px' }}>
-          <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={onClose}>Close</button>
-          <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={() => onSetWarning ? onSetWarning(handleSet) : handleSet()}>Set</button>
+          <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={onClose}>{t('popup.close')}</button>
+          <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={() => onSetWarning ? onSetWarning(handleSet) : handleSet()}>{t('popup.set')}</button>
         </div>
       </div>
     </div>

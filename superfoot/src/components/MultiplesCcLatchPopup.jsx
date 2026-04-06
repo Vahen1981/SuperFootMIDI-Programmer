@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import './banktype.css'
 import { SAVE_DATA, TYPE_CC, GREEN_PEDALS, LATCH, sendSysexRequest } from './midiUtils'
 import { presetsData } from '../backend/datatransfer'
+import { useLanguage } from '../context/LanguageContext.jsx'
 
 export const MultiplesCcLatchPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput, onSetWarning }) => {
+  const { t } = useLanguage()
   const [midiChannel, setMidiChannel] = useState(1)
   const [firstCC, setFirstCC] = useState('empty')
   const [secondCC, setSecondCC] = useState('empty')
@@ -59,12 +61,12 @@ export const MultiplesCcLatchPopup = ({ isOpen, onClose, pedal, bank, type, midi
   return (
     <div className='banktype-overlay' onClick={onOverlayClick}>
       <div className='banktype-popup' onClick={onPopupClick}>
-        <h2>{`Pedal ${pedal} - Bank ${bank}`}</h2>
-        <p className='subtitle' style={{ paddingTop: '5px', borderTop: '1px solid #6b6b6bff', marginBottom: '40px', textAlign: 'right' }}>Multiples Control Change (On/Off)</p>
+        <h2>{`${t('popup.pedal')} ${pedal} - ${t('popup.bank')} ${bank}`}</h2>
+        <p className='subtitle' style={{ paddingTop: '5px', borderTop: '1px solid #6b6b6bff', marginBottom: '40px', textAlign: 'right' }}>{t('mcc.title')}</p>
         
         <div className='popup-fields'>
           <div className='popup-field-row'>
-            <label htmlFor='mccl-popup-midi-channel'>MIDI Channel (1-16)</label>
+            <label htmlFor='mccl-popup-midi-channel'>{t('popup.midiChannel')}</label>
             <select
               id='mccl-popup-midi-channel'
               className='popup-field-select'
@@ -81,12 +83,12 @@ export const MultiplesCcLatchPopup = ({ isOpen, onClose, pedal, bank, type, midi
             const stateValue = i === 1 ? firstCC : i === 2 ? secondCC : thirdCC
             const setStateValue = i === 1 ? setFirstCC : i === 2 ? setSecondCC : setThirdCC
             const disabled = i === 1 ? false : (i === 2 ? firstCC === 'empty' : secondCC === 'empty')
-            const valueLabel = i === 1 ? '1st' : i === 2 ? '2nd' : '3rd'
+            const valueLabel = i === 1 ? '1' : i === 2 ? '2' : '3'
             const selectId = `mccl-popup-cc-${i}`
 
             return (
               <div key={i} className='popup-field-row'>
-                <label htmlFor={selectId}>{`CC ${valueLabel} Number (0-127)`}</label>
+                <label htmlFor={selectId}>{`${t('mcc.message')} ${valueLabel}`}</label>
                 <select
                   id={selectId}
                   className='popup-field-select'
@@ -112,8 +114,8 @@ export const MultiplesCcLatchPopup = ({ isOpen, onClose, pedal, bank, type, midi
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '50px', gap: '12px' }}>
-          <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={onClose}>Close</button>
-          <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={() => onSetWarning ? onSetWarning(handleSet) : handleSet()}>Set</button>
+          <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={onClose}>{t('popup.close')}</button>
+          <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={() => onSetWarning ? onSetWarning(handleSet) : handleSet()}>{t('popup.set')}</button>
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useId } from 'react'
 import './banktype.css'
 import './confirmPopups.css'
+import { useLanguage } from '../context/LanguageContext.jsx'
 
 export const ConfirmDeviceWritePopup = ({
   isOpen,
@@ -10,6 +11,7 @@ export const ConfirmDeviceWritePopup = ({
   children,
   acknowledgeLabel,
 }) => {
+  const { t } = useLanguage()
   const [acknowledged, setAcknowledged] = useState(false)
   const acknowledgeId = useId()
 
@@ -37,10 +39,10 @@ export const ConfirmDeviceWritePopup = ({
         </div>
         <div className='confirm-device-actions'>
           <button type='button' className='confirm-device-btn-secondary' onClick={onCancel}>
-            Cancelar
+            {t('banktype.cancel')}
           </button>
           <button type='button' disabled={!acknowledged} onClick={onConfirm}>
-            Aceptar
+            {t('banktype.accept')}
           </button>
         </div>
       </div>

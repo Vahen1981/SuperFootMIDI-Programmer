@@ -13,6 +13,7 @@ import ledRojo from '../../assets/ledRojo.png'
 import ledVerde from '../../assets/ledVerde.png'
 import { SAVE_DATA, REQUEST_DATA } from '../midiUtils.js'
 import { BANK_TYPES, FACTORY_SETTINGS } from '../../data/factory.js'
+import { useLanguage } from '../../context/LanguageContext.jsx'
 
 
 
@@ -36,6 +37,7 @@ const clearSuperFootInputListeners = (midiAccess) => {
 }
 
 export const Interface = () => {
+  const { t, language, toggleLanguage } = useLanguage()
   const [activeGreen, setActiveGreen] = useState(null)
   const [counter, setCounter] = useState(0)
   const [upPressed, setUpPressed] = useState(false)
@@ -413,8 +415,11 @@ export const Interface = () => {
               alt={isDeviceOnline ? 'LED online' : 'LED offline'}
               className='status-led'
             />
-            <span className='status-text'>{isDeviceOnline ? 'Online' : 'Offline'}</span>
+            <span className='status-text'>{isDeviceOnline ? t('interface.online') : t('interface.offline')}</span>
           </div>
+          <button className='language-button' onClick={toggleLanguage}>
+            {language === 'en' ? 'EN / ES' : 'ES / EN'}
+          </button>
           <div className='buttons-container'>
             <button
               className='bank-button'
@@ -423,13 +428,13 @@ export const Interface = () => {
                 setIsBankTypeOpen(true)
               }}
             >
-              Set Banks
+              {t('interface.setBanks')}
             </button>
             <button className='bank-button' onClick={onProgramButtonClick}>
-              Program
+              {t('interface.program')}
             </button>
             <button className='bank-button' onClick={onFactoryButtonClick}>
-              Factory
+              {t('interface.factory')}
             </button>
           </div>
         </div>
@@ -645,36 +650,22 @@ export const Interface = () => {
         isOpen={programConfirmOpen}
         onCancel={() => setProgramConfirmOpen(false)}
         onConfirm={handleProgramConfirm}
-        title='Confirmar envío al dispositivo'
-        acknowledgeLabel='Entiendo que con esto modificaré los presets actualmente presentes en mi dispositivo'
+        title={t("confirm.program.title")}
+        acknowledgeLabel={t("confirm.ack")}
       >
-        <p>
-          Si continúa, se enviarán al dispositivo <strong>SuperFoot MIDI</strong> todos los cambios que
-          haya realizado en esta aplicación web.
-        </p>
-        <p>
-          Eso <strong>reemplazará en el dispositivo</strong> los bancos y presets según lo que tenga
-          ahora en la app: todo lo que haya modificado aquí sustituirá la configuración correspondiente
-          en el hardware.
-        </p>
+        <p dangerouslySetInnerHTML={{ __html: t("confirm.program.p1") }}></p>
+        <p dangerouslySetInnerHTML={{ __html: t("confirm.program.p2") }}></p>
       </ConfirmDeviceWritePopup>
 
       <ConfirmDeviceWritePopup
         isOpen={factoryConfirmOpen}
         onCancel={() => setFactoryConfirmOpen(false)}
         onConfirm={handleFactoryConfirm}
-        title='Restaurar ajustes de fábrica'
-        acknowledgeLabel='Entiendo que con esto modificaré los presets actualmente presentes en mi dispositivo'
+        title={t("confirm.factory.title")}
+        acknowledgeLabel={t("confirm.ack")}
       >
-        <p>
-          Si continúa, se enviará al dispositivo <strong>SuperFoot MIDI</strong> la configuración de{' '}
-          <strong>fábrica</strong>.
-        </p>
-        <p>
-          <strong>Todos los bancos y todos los presets</strong> volverán a los valores predeterminados de
-          fábrica, reemplazando por completo la configuración que esté guardada actualmente en el
-          dispositivo.
-        </p>
+        <p dangerouslySetInnerHTML={{ __html: t("confirm.factory.p1") }}></p>
+        <p dangerouslySetInnerHTML={{ __html: t("confirm.factory.p2") }}></p>
       </ConfirmDeviceWritePopup>
 
       <SendSuccessPopup isOpen={sendSuccessOpen} onAccept={() => setSendSuccessOpen(false)} />

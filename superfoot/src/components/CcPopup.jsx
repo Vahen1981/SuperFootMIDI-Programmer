@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import './banktype.css'
 import { SAVE_DATA, TYPE_CC, GREEN_PEDALS, NON_LATCH, sendSysexRequest } from './midiUtils'
 import { presetsData } from '../backend/datatransfer'
+import { useLanguage } from '../context/LanguageContext.jsx'
 
 export const CcPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput, onSetWarning }) => {
+  const { t } = useLanguage()
   const [midiChannel, setMidiChannel] = useState(1)
   const [ccNumber, setCcNumber] = useState(0)
   const [ccValue, setCcValue] = useState(0)
@@ -46,12 +48,12 @@ export const CcPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput, onSetW
   return (
     <div className='banktype-overlay' onClick={onOverlayClick}>
       <div className='banktype-popup' onClick={onPopupClick}>
-        <h2>{`Pedal ${pedal} - Bank ${bank}`}</h2>
-        <p className='subtitle' style={{ paddingTop: '5px', borderTop: '1px solid #6b6b6bff', marginBottom: '40px', textAlign: 'right' }}>Control Change</p>
+        <h2>{`${t('popup.pedal')} ${pedal} - ${t('popup.bank')} ${bank}`}</h2>
+        <p className='subtitle' style={{ paddingTop: '5px', borderTop: '1px solid #6b6b6bff', marginBottom: '40px', textAlign: 'right' }}>{t('cc.title')}</p>
         
         <div className='popup-fields'>
           <div className='popup-field-row'>
-            <label htmlFor='cc-popup-midi-channel'>MIDI Channel (1-16)</label>
+            <label htmlFor='cc-popup-midi-channel'>{t('popup.midiChannel')}</label>
             <select
               id='cc-popup-midi-channel'
               className='popup-field-select'
@@ -65,7 +67,7 @@ export const CcPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput, onSetW
           </div>
 
           <div className='popup-field-row'>
-            <label htmlFor='cc-popup-cc-number'>CC Number (0-127)</label>
+            <label htmlFor='cc-popup-cc-number'>{t('cc.ccNumber')}</label>
             <select
               id='cc-popup-cc-number'
               className='popup-field-select'
@@ -79,7 +81,7 @@ export const CcPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput, onSetW
           </div>
 
           <div className='popup-field-row'>
-            <label htmlFor='cc-popup-cc-value'>CC Value (0-127)</label>
+            <label htmlFor='cc-popup-cc-value'>{t('cc.value')}</label>
             <select
               id='cc-popup-cc-value'
               className='popup-field-select'
@@ -94,8 +96,8 @@ export const CcPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput, onSetW
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '50px', gap: '12px' }}>
-          <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={onClose}>Close</button>
-          <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={() => onSetWarning ? onSetWarning(handleSet) : handleSet()}>Set</button>
+          <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={onClose}>{t('popup.close')}</button>
+          <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={() => onSetWarning ? onSetWarning(handleSet) : handleSet()}>{t('popup.set')}</button>
         </div>
       </div>
     </div>
