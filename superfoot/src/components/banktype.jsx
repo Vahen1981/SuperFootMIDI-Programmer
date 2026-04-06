@@ -8,6 +8,7 @@ import {
   CC_NON_LATCH_BANK_TEMP,
   NOTES_BANK_TEMP
 } from '../data/BankTemp.js'
+import { useLanguage } from '../context/LanguageContext.jsx'
 
 const options = [
   'Program Change (Presets control)',
@@ -34,6 +35,7 @@ const optionToDefaultData = {
 }
 
 export const BankType = ({ isOpen, onClose, bankTypes, setBankTypes }) => {
+  const { t } = useLanguage()
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, index: null, value: null })
 
   if (!isOpen) return null
@@ -66,11 +68,11 @@ export const BankType = ({ isOpen, onClose, bankTypes, setBankTypes }) => {
   return (
     <div className="banktype-overlay">
       <div className="banktype-popup">
-        <h2>Bank Types</h2>
+        <h2>{t('banktype.title')}</h2>
         <div className="banktype-list">
           {bankTypes.map((type, index) => (
             <div key={index} className="banktype-item">
-              <label>Bank {index + 1}:</label>
+              <label>{t('popup.bank')} {index + 1}:</label>
               <select
                 value={type}
                 onChange={(e) => handleSelectChange(index, e.target.value)}
@@ -84,21 +86,19 @@ export const BankType = ({ isOpen, onClose, bankTypes, setBankTypes }) => {
             </div>
           ))}
         </div>
-        <button onClick={onClose}>Close</button>
+        <button onClick={onClose}>{t('popup.close')}</button>
       </div>
 
       {confirmModal.isOpen && (
         <div className="warning-overlay">
           <div className="warning-popup">
-            <h3>Warning</h3>
+            <h3>{t('banktype.warningTitle')}</h3>
             <p>
-              Are you sure you want to change the bank type? 
-              All current pedal presets for this bank will be deleted and replaced with default values for the new bank type. 
-              You can change them later to your preferences.
+              {t('banktype.warningDesc')}
             </p>
             <div className="warning-actions">
-              <button className="confirm-btn" onClick={handleConfirm}>Accept</button>
-              <button className="cancel-btn" onClick={handleCancel}>Cancel</button>
+              <button className="confirm-btn" onClick={handleConfirm}>{t('banktype.accept')}</button>
+              <button className="cancel-btn" onClick={handleCancel}>{t('banktype.cancel')}</button>
             </div>
           </div>
         </div>

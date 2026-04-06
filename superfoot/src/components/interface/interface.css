@@ -49,22 +49,42 @@
     align-items: flex-end;
 }
 
+.language-button {
+    width: calc(var(--width) * 0.08);
+    height: calc(var(--width) * 0.03);
+    background: rgba(255, 0, 0, 0.507);
+    color: rgb(255, 255, 255);
+    border: 1px solid rgba(255, 181, 181, 0.23);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    font-family: "Urbanist", sans-serif;
+    font-size: calc(var(--width) * 0.011);
+    font-weight: 800;
+    margin: calc(var(--width) * 0.004) calc(var(--width) * 0.008);
+}
+
 .bank-button {
-    width: calc(var(--width) * 0.1);
+    width: calc(var(--width) * 0.15);
     height: calc(var(--width) * 0.03);
     background: rgba(255, 181, 181, 0.23);
     color: white;
     border: 1px solid rgba(255, 181, 181, 0.23);
-    border-radius: 20px;
+    border-radius: calc(var(--width) * 0.009);
     cursor: pointer;
     transition: background 0.3s ease, transform 0.2s ease;
     font-family: "Urbanist", sans-serif;
-    font-size: calc(var(--width) * 0.012);
+    font-size: calc(var(--width) * 0.011);
     font-weight: 800;
     margin: calc(var(--width) * 0.004) calc(var(--width) * 0.008);
 }
 
 .bank-button:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: translateY(-1px);
+}
+
+.language-button:hover {
     background: rgba(255, 255, 255, 0.35);
     transform: translateY(-1px);
 }

@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import './banktype.css'
 import { SAVE_DATA, TYPE_PC, GREEN_PEDALS, sendSysexRequest } from './midiUtils'
 import { presetsData } from '../backend/datatransfer'
+import { useLanguage } from '../context/LanguageContext.jsx'
 
 export const ProgramChangePopup = ({ isOpen, onClose, pedal, bank, type, midiOutput, onSetWarning }) => {
+  const { t } = useLanguage()
   const [midiChannel, setMidiChannel] = useState(1)
   const [programChange, setProgramChange] = useState(0)
 
@@ -43,11 +45,11 @@ export const ProgramChangePopup = ({ isOpen, onClose, pedal, bank, type, midiOut
   return (
     <div className='banktype-overlay' onClick={onOverlayClick}>
       <div className='banktype-popup' onClick={onPopupClick}>
-        <h2>{`Pedal ${pedal} - Bank ${bank}`}</h2>
-        <p className='subtitle' style={{ paddingTop: '5px', borderTop: '1px solid #6b6b6bff', marginBottom: '40px', textAlign: 'right' }}>Program Change</p>
+        <h2>{`${t('popup.pedal')} ${pedal} - ${t('popup.bank')} ${bank}`}</h2>
+        <p className='subtitle' style={{ paddingTop: '5px', borderTop: '1px solid #6b6b6bff', marginBottom: '40px', textAlign: 'right' }}>{t('pc.title')}</p>
         <div className='popup-fields'>
           <div className='popup-field-row'>
-            <label htmlFor='pc-popup-midi-channel'>MIDI Channel</label>
+            <label htmlFor='pc-popup-midi-channel'>{t('popup.midiChannel')}</label>
             <select
               id='pc-popup-midi-channel'
               className='popup-field-select'
@@ -61,7 +63,7 @@ export const ProgramChangePopup = ({ isOpen, onClose, pedal, bank, type, midiOut
           </div>
 
           <div className='popup-field-row'>
-            <label htmlFor='pc-popup-program-number'>PC#</label>
+            <label htmlFor='pc-popup-program-number'>{t('pc.pcNumber')}</label>
             <select
               id='pc-popup-program-number'
               className='popup-field-select'
@@ -76,8 +78,8 @@ export const ProgramChangePopup = ({ isOpen, onClose, pedal, bank, type, midiOut
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '50px', gap: '12px' }}>
-          <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={onClose}>Close</button>
-          <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={() => onSetWarning ? onSetWarning(handleSet) : handleSet()}>Set</button>
+          <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={onClose}>{t('popup.close')}</button>
+          <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={() => onSetWarning ? onSetWarning(handleSet) : handleSet()}>{t('popup.set')}</button>
         </div>
       </div>
     </div>

@@ -1,6 +1,8 @@
 import './banktype.css'
+import { useLanguage } from '../context/LanguageContext.jsx'
 
 export const DeviceDisconnectedPopup = ({ isOpen, onAccept }) => {
+  const { t } = useLanguage()
   if (!isOpen) return null
 
   const onPopupClick = (e) => e.stopPropagation()
@@ -8,14 +10,12 @@ export const DeviceDisconnectedPopup = ({ isOpen, onAccept }) => {
   return (
     <div className='banktype-overlay'>
       <div className='banktype-popup' onClick={onPopupClick}>
-        <h2>SuperFoot MIDI desconectado</h2>
-        <p style={{ marginBottom: '24px', lineHeight: 1.5, color: '#333', fontSize: '17px' }}>
-          El dispositivo <strong>SuperFoot MIDI</strong> está desconectado o no está disponible. Por
-          eso la aplicación no puede enviar ni aplicar ningún cambio en el dispositivo.
+        <h2>{t('disconnect.title')}</h2>
+        <p style={{ marginBottom: '24px', lineHeight: 1.5, color: '#333', fontSize: '17px' }} dangerouslySetInnerHTML={{ __html: t('disconnect.desc') }}>
         </p>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <button type='button' onClick={onAccept}>
-            Aceptar
+            {t('disconnect.ok')}
           </button>
         </div>
       </div>
