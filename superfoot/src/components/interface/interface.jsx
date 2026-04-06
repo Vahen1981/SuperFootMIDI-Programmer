@@ -7,13 +7,24 @@ import { PedalTypePopup } from '../pedaltypepopup.jsx'
 import { DeviceDisconnectedPopup } from '../DeviceDisconnectedPopup.jsx'
 import { ConfirmDeviceWritePopup } from '../ConfirmDeviceWritePopup.jsx'
 import { SendSuccessPopup } from '../SendSuccessPopup.jsx'
+import { SendProgressPopup } from '../SendProgressPopup.jsx'
 import { banksData, presetsData } from '../../backend/datatransfer'
 import logo from '../../assets/logo.png'
 import ledRojo from '../../assets/ledRojo.png'
 import ledVerde from '../../assets/ledVerde.png'
-import { SAVE_DATA, REQUEST_DATA } from '../midiUtils.js'
+import {
+  REQUEST_DATA,
+  SAVE_DATA_CHUNK_COUNT,
+  SAVE_DATA_PAYLOAD_LENGTH,
+  buildSaveDataChunkSysex,
+  mergeRequestDataChunkPayloads,
+  parseRequestDataSysexChunk,
+  sendSysexRequest,
+} from '../midiUtils.js'
 import { BANK_TYPES, FACTORY_SETTINGS } from '../../data/factory.js'
 import { useLanguage } from '../../context/LanguageContext.jsx'
+
+const SAVE_DATA_CHUNK_INTERVAL_MS = 500
 
 
 
@@ -71,7 +82,26 @@ export const Interface = () => {
   const [programConfirmOpen, setProgramConfirmOpen] = useState(false)
   const [factoryConfirmOpen, setFactoryConfirmOpen] = useState(false)
   const [sendSuccessOpen, setSendSuccessOpen] = useState(false)
+  const [sendProgressOpen, setSendProgressOpen] = useState(false)
+  const [sendProgressSent, setSendProgressSent] = useState(0)
+  const [sendProgressTitleKey, setSendProgressTitleKey] = useState('progress.titleSendingProgram')
+  const [receiveProgressOpen, setReceiveProgressOpen] = useState(false)
+  const [receiveProgressCount, setReceiveProgressCount] = useState(0)
   const initialDisconnectShownRef = useRef(false)
+  const saveDataSendSessionRef = useRef(0)
+  const receiveProgressRef = useRef({
+    open: () => {},
+    close: () => {},
+    setCount: () => {},
+  })
+  receiveProgressRef.current = {
+    open: () => {
+      setReceiveProgressOpen(true)
+      setReceiveProgressCount(0)
+    },
+    close: () => setReceiveProgressOpen(false),
+    setCount: (n) => setReceiveProgressCount(n),
+  }
 
   const [pedalInfoOpen, setPedalInfoOpen] = useState(false)
   const [selectedPedalInfo, setSelectedPedalInfo] = useState(null)
@@ -207,6 +237,28 @@ export const Interface = () => {
 
     const session = ++sysexSessionRef.current
     let midiInput = null
+    const requestDataChunkMap = new Map()
+
+    const applyDevicePayload570 = (payload) => {
+      if (payload.length !== SAVE_DATA_PAYLOAD_LENGTH) return
+      if (!USE_FACTORY_DATA) {
+        let index = 0
+        for (let i = 0; i < 10; i++) banksData[i] = payload[index++]
+
+        for (let b = 0; b < 10; b++) {
+          for (let p = 0; p < 8; p++) {
+            for (let d = 0; d < 7; d++) {
+              presetsData[b][p][d] = payload[index++]
+            }
+          }
+        }
+
+        setBankTypes(Array.from(banksData).slice(0, 10).map((code) => bankTypeName(code)))
+        console.log('Sysex payload loaded correctly into banksData and presetsData.')
+      } else {
+        console.log('Received Sysex but skipped parsing because USE_FACTORY_DATA is true. Using factory logic.')
+      }
+    }
 
     for (const input of midiAccess.inputs.values()) {
       if (!input.name || !input.name.toLowerCase().includes('superfoot midi')) continue
@@ -215,6 +267,7 @@ export const Interface = () => {
       input.onmidimessage = (event) => {
         if (session !== sysexSessionRef.current) return
         const data = event.data
+
         if (
           data.length === 576 &&
           data[0] === 0xf0 &&
@@ -222,24 +275,40 @@ export const Interface = () => {
           data[2] === 0x6f &&
           data[3] === 0x71
         ) {
-          if (!USE_FACTORY_DATA) {
-            let index = 5
-            for (let i = 0; i < 10; i++) banksData[i] = data[index++]
-
-            for (let b = 0; b < 10; b++) {
-              for (let p = 0; p < 8; p++) {
-                for (let d = 0; d < 7; d++) {
-                  presetsData[b][p][d] = data[index++]
-                }
-              }
-            }
-
-            setBankTypes(Array.from(banksData).slice(0, 10).map((code) => bankTypeName(code)))
-            console.log('Sysex payload loaded correctly into banksData and presetsData.')
-          } else {
-            console.log('Received Sysex but skipped parsing because USE_FACTORY_DATA is true. Using factory logic.')
-          }
+          requestDataChunkMap.clear()
+          receiveProgressRef.current.setCount(SAVE_DATA_CHUNK_COUNT)
+          receiveProgressRef.current.close()
+          applyDevicePayload570(new Uint8Array(data.subarray(5, 5 + SAVE_DATA_PAYLOAD_LENGTH)))
+          return
         }
+
+        const parsed = parseRequestDataSysexChunk(data)
+        if (!parsed) return
+        if (parsed.totalChunks !== SAVE_DATA_CHUNK_COUNT) {
+          console.warn(
+            'REQUEST_DATA chunk totalChunks inesperado:',
+            parsed.totalChunks,
+            '(se esperaba',
+            SAVE_DATA_CHUNK_COUNT + ')'
+          )
+        }
+        requestDataChunkMap.set(parsed.chunkIndex, parsed.payload)
+        receiveProgressRef.current.setCount(requestDataChunkMap.size)
+
+        const total = parsed.totalChunks
+        if (requestDataChunkMap.size < total) return
+        for (let i = 0; i < total; i++) {
+          if (!requestDataChunkMap.has(i)) return
+        }
+
+        const merged = mergeRequestDataChunkPayloads(requestDataChunkMap, total)
+        if (!merged) {
+          console.warn('No se pudo ensamblar REQUEST_DATA en 570 bytes.')
+          return
+        }
+        requestDataChunkMap.clear()
+        receiveProgressRef.current.close()
+        applyDevicePayload570(merged)
       }
       break
     }
@@ -251,6 +320,7 @@ export const Interface = () => {
       if (!outputForSend || outputForSend.state !== 'connected') return
       try {
         outputForSend.send(requestSysex)
+        receiveProgressRef.current.open()
         console.log(
           'Sent data request upon connection:',
           requestSysex.map((b) => '0x' + b.toString(16).toUpperCase().padStart(2, '0'))
@@ -262,6 +332,7 @@ export const Interface = () => {
 
     return () => {
       sysexSessionRef.current++
+      receiveProgressRef.current.close()
       try {
         if (midiInput) midiInput.onmidimessage = null
       } catch {
@@ -283,55 +354,37 @@ export const Interface = () => {
     openPedalInfo(pedal)
   }
 
-  const sendProgramSysexToDevice = useCallback(() => {
-    if (!midiOutput) return false
-    const banksFlat = Array.from(banksData)
-    const presetsFlat = presetsData.flat(2)
-    const programRequest = [
-      0xf0, 0x74, 0x6f, 0x71, SAVE_DATA,
-      ...banksFlat,
-      ...presetsFlat,
-      0xf7,
-    ]
-    try {
-      midiOutput.send(programRequest)
-      console.log('Program Sysex sent to SuperFoot MIDI successfully!')
-      console.log('Payload array (dec):', programRequest)
-      const requestHex = programRequest.map((byte) =>
-        `0x${Number(byte).toString(16).toUpperCase().padStart(2, '0')}`
-      )
-      console.log('Payload array (hex):', requestHex)
+  const sendSaveDataPayload570InChunks = useCallback(
+    async (payload570, { onComplete } = {}) => {
+      if (!midiOutput) return false
+      if (payload570.length !== SAVE_DATA_PAYLOAD_LENGTH) {
+        console.error('SAVE_DATA payload length:', payload570.length, 'expected', SAVE_DATA_PAYLOAD_LENGTH)
+        return false
+      }
+      const session = ++saveDataSendSessionRef.current
+      for (let i = 0; i < SAVE_DATA_CHUNK_COUNT; i++) {
+        if (session !== saveDataSendSessionRef.current) return false
+        if (!midiOutput || midiOutput.state !== 'connected') return false
+        if (i > 0) {
+          await new Promise((resolve) => setTimeout(resolve, SAVE_DATA_CHUNK_INTERVAL_MS))
+        }
+        if (session !== saveDataSendSessionRef.current) return false
+        if (!midiOutput || midiOutput.state !== 'connected') return false
+        try {
+          const chunk = buildSaveDataChunkSysex(payload570, i)
+          sendSysexRequest(midiOutput, chunk)
+          setSendProgressSent(i + 1)
+        } catch (error) {
+          console.error('Error sending SAVE_DATA chunk', i, error)
+          return false
+        }
+      }
+      console.log('SAVE_DATA Sysex (chunked) sent to SuperFoot MIDI successfully!')
+      onComplete?.()
       return true
-    } catch (error) {
-      console.error('Error sending Program Sysex:', error)
-      return false
-    }
-  }, [midiOutput])
-
-  const sendFactorySysexToDevice = useCallback(() => {
-    if (!midiOutput) return false
-    const factoryBanksFlat = [...BANK_TYPES]
-    const factoryPresetsFlat = FACTORY_SETTINGS.flat(2)
-    const factoryProgramRequest = [
-      0xf0, 0x74, 0x6f, 0x71, SAVE_DATA,
-      ...factoryBanksFlat,
-      ...factoryPresetsFlat,
-      0xf7,
-    ]
-    try {
-      midiOutput.send(factoryProgramRequest)
-      console.log('FACTORY RESET Sysex sent to SuperFoot MIDI successfully!')
-      console.log('Payload array (dec):', factoryProgramRequest)
-      const requestHex = factoryProgramRequest.map((byte) =>
-        `0x${Number(byte).toString(16).toUpperCase().padStart(2, '0')}`
-      )
-      console.log('Payload array (hex):', requestHex)
-      return true
-    } catch (error) {
-      console.error('Error sending Factory Reset Sysex:', error)
-      return false
-    }
-  }, [midiOutput])
+    },
+    [midiOutput]
+  )
 
   const onProgramButtonClick = () => {
     if (warnIfDisconnected()) return
@@ -345,14 +398,50 @@ export const Interface = () => {
 
   const handleProgramConfirm = () => {
     setProgramConfirmOpen(false)
+    setReceiveProgressOpen(false)
     if (warnIfDisconnected()) return
-    if (sendProgramSysexToDevice()) setSendSuccessOpen(true)
+    const banksFlat = Array.from(banksData)
+    const presetsFlat = presetsData.flat(2)
+    const payload570 = [...banksFlat, ...presetsFlat]
+    if (payload570.length !== SAVE_DATA_PAYLOAD_LENGTH) {
+      console.error('SAVE_DATA payload length:', payload570.length, 'expected', SAVE_DATA_PAYLOAD_LENGTH)
+      return
+    }
+    setSendProgressTitleKey('progress.titleSendingProgram')
+    setSendProgressSent(0)
+    setSendProgressOpen(true)
+    void sendSaveDataPayload570InChunks(payload570, {
+      onComplete: () => {
+        setSendProgressOpen(false)
+        setSendSuccessOpen(true)
+      },
+    }).then((ok) => {
+      if (!ok) setSendProgressOpen(false)
+    })
   }
 
   const handleFactoryConfirm = () => {
     setFactoryConfirmOpen(false)
+    setReceiveProgressOpen(false)
     if (warnIfDisconnected()) return
-    if (sendFactorySysexToDevice()) setSendSuccessOpen(true)
+    const factoryBanksFlat = [...BANK_TYPES]
+    const factoryPresetsFlat = FACTORY_SETTINGS.flat(2)
+    const payload570 = [...factoryBanksFlat, ...factoryPresetsFlat]
+    if (payload570.length !== SAVE_DATA_PAYLOAD_LENGTH) {
+      console.error('SAVE_DATA payload length:', payload570.length, 'expected', SAVE_DATA_PAYLOAD_LENGTH)
+      return
+    }
+    setSendProgressTitleKey('progress.titleSendingFactory')
+    setSendProgressSent(0)
+    setSendProgressOpen(true)
+    void sendSaveDataPayload570InChunks(payload570, {
+      onComplete: () => {
+        setSendProgressOpen(false)
+        setSendSuccessOpen(true)
+      },
+    }).then((ok) => {
+      if (!ok) setSendProgressOpen(false)
+    })
   }
 
   const openPedalInfo = (pedal) => {
@@ -667,6 +756,16 @@ export const Interface = () => {
         <p dangerouslySetInnerHTML={{ __html: t("confirm.factory.p1") }}></p>
         <p dangerouslySetInnerHTML={{ __html: t("confirm.factory.p2") }}></p>
       </ConfirmDeviceWritePopup>
+
+      <SendProgressPopup
+        isOpen={sendProgressOpen || receiveProgressOpen}
+        title={
+          sendProgressOpen ? t(sendProgressTitleKey) : t('progress.titleLoading')
+        }
+        sentChunks={sendProgressOpen ? sendProgressSent : receiveProgressCount}
+        totalChunks={SAVE_DATA_CHUNK_COUNT}
+        variant={sendProgressOpen ? 'send' : 'receive'}
+      />
 
       <SendSuccessPopup isOpen={sendSuccessOpen} onAccept={() => setSendSuccessOpen(false)} />
     </div>
