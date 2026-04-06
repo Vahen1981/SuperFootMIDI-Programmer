@@ -76,7 +76,17 @@ export const translations = {
     "confirm.program.p2": "This will <strong>overwrite on the device</strong> the banks and presets according to what you have here. Everything modified on the app will replace the hardware configuration.",
     "confirm.factory.title": "Restore Factory Settings",
     "confirm.factory.p1": "If you continue, the <strong>Factory settings</strong> will be sent to <strong>SuperFoot MIDI</strong>.",
-    "confirm.factory.p2": "<strong>All banks and presets</strong> will revert back to their default factory settings, completely replacing the configuration currently saved natively on the device."
+    "confirm.factory.p2": "<strong>All banks and presets</strong> will revert back to their default factory settings, completely replacing the configuration currently saved natively on the device.",
+
+    // Progress (send / receive chunks)
+    "progress.titleLoading": "Loading from device",
+    "progress.titleSendingProgram": "Sending configuration",
+    "progress.titleSendingFactory": "Sending factory settings",
+    "progress.descSend": "Sending data in several messages for better compatibility.",
+    "progress.descReceive": "Loading configuration from the device. Data may arrive in several messages; the bar shows how many fragments have been received.",
+    "progress.warnDisconnect": "Important: do not unplug the cable or disconnect the device until this finishes—the transfer may fail or stay incomplete.",
+    "progress.labelSent": "{current} of {total} packets sent ({pct}%)",
+    "progress.labelReceived": "{current} of {total} packets received ({pct}%)"
   },
   es: {
     // Interface buttons & status
@@ -155,6 +165,16 @@ export const translations = {
     "confirm.program.p2": "Eso <strong>reemplazará en el dispositivo</strong> los bancos y presets según lo que tenga ahora en la app: todo lo que haya modificado aquí sustituirá la configuración correspondiente en el hardware.",
     "confirm.factory.title": "Restaurar ajustes de fábrica",
     "confirm.factory.p1": "Si continúa, se enviará al dispositivo <strong>SuperFoot MIDI</strong> la configuración de <strong>fábrica</strong>.",
-    "confirm.factory.p2": "<strong>Todos los bancos y todos los presets</strong> volverán a los valores predeterminados de fábrica, reemplazando por completo la configuración que esté guardada actualmente en el dispositivo."
+    "confirm.factory.p2": "<strong>Todos los bancos y todos los presets</strong> volverán a los valores predeterminados de fábrica, reemplazando por completo la configuración que esté guardada actualmente en el dispositivo.",
+
+    // Progress (send / receive chunks)
+    "progress.titleLoading": "Cargando desde el dispositivo",
+    "progress.titleSendingProgram": "Enviando configuración",
+    "progress.titleSendingFactory": "Enviando ajustes de fábrica",
+    "progress.descSend": "Enviando datos en varios mensajes para mayor compatibilidad.",
+    "progress.descReceive": "Cargando la configuración desde el dispositivo. Los datos pueden llegar en varios mensajes; la barra indica cuántos fragmentos se han recibido.",
+    "progress.warnDisconnect": "Importante: no desconecte el cable ni desenchufe el dispositivo hasta que termine esta operación; la transferencia puede fallar o quedar incompleta.",
+    "progress.labelSent": "{current} de {total} paquetes enviados ({pct}%)",
+    "progress.labelReceived": "{current} de {total} paquetes recibidos ({pct}%)"
   }
 };
