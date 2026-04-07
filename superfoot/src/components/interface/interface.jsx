@@ -8,7 +8,8 @@ import { DeviceDisconnectedPopup } from '../DeviceDisconnectedPopup.jsx'
 import { ConfirmDeviceWritePopup } from '../ConfirmDeviceWritePopup.jsx'
 import { SendSuccessPopup } from '../SendSuccessPopup.jsx'
 import { SendProgressPopup } from '../SendProgressPopup.jsx'
-import { banksData, presetsData } from '../../backend/datatransfer'
+import { ExpressionPopup } from '../ExpressionPopup.jsx'
+import { banksData, presetsData, expressionData } from '../../backend/datatransfer'
 import logo from '../../assets/logo.png'
 import ledRojo from '../../assets/ledRojo.png'
 import ledVerde from '../../assets/ledVerde.png'
@@ -21,7 +22,7 @@ import {
   parseRequestDataSysexChunk,
   sendSysexRequest,
 } from '../midiUtils.js'
-import { BANK_TYPES, FACTORY_SETTINGS } from '../../data/factory.js'
+import { BANK_TYPES, FACTORY_SETTINGS, EXPRESSION_SETTINGS } from '../../data/factory.js'
 import { useLanguage } from '../../context/LanguageContext.jsx'
 
 const SAVE_DATA_CHUNK_INTERVAL_MS = 500
@@ -55,6 +56,7 @@ export const Interface = () => {
   const [downPressed, setDownPressed] = useState(false)
   const [pressedPedal, setPressedPedal] = useState(null)
   const [isBankTypeOpen, setIsBankTypeOpen] = useState(false)
+  const [isExpressionOpen, setIsExpressionOpen] = useState(false)
 
   const bankTypeName = (code) => {
     switch (code) {
@@ -239,7 +241,7 @@ export const Interface = () => {
     let midiInput = null
     const requestDataChunkMap = new Map()
 
-    const applyDevicePayload570 = (payload) => {
+    const applyDevicePayload572 = (payload) => {
       if (payload.length !== SAVE_DATA_PAYLOAD_LENGTH) return
       if (!USE_FACTORY_DATA) {
         let index = 0
@@ -253,8 +255,11 @@ export const Interface = () => {
           }
         }
 
+        expressionData[0] = payload[index++]
+        expressionData[1] = payload[index++]
+
         setBankTypes(Array.from(banksData).slice(0, 10).map((code) => bankTypeName(code)))
-        console.log('Sysex payload loaded correctly into banksData and presetsData.')
+        console.log('Sysex payload loaded correctly into banksData, presetsData and expressionData.')
       } else {
         console.log('Received Sysex but skipped parsing because USE_FACTORY_DATA is true. Using factory logic.')
       }
@@ -269,7 +274,7 @@ export const Interface = () => {
         const data = event.data
 
         if (
-          data.length === 576 &&
+          data.length === 578 &&
           data[0] === 0xf0 &&
           data[1] === 0x74 &&
           data[2] === 0x6f &&
@@ -278,37 +283,50 @@ export const Interface = () => {
           requestDataChunkMap.clear()
           receiveProgressRef.current.setCount(SAVE_DATA_CHUNK_COUNT)
           receiveProgressRef.current.close()
-          applyDevicePayload570(new Uint8Array(data.subarray(5, 5 + SAVE_DATA_PAYLOAD_LENGTH)))
+          applyDevicePayload572(new Uint8Array(data.subarray(5, 5 + SAVE_DATA_PAYLOAD_LENGTH)))
+          if (window._sysexLoadTimeout) clearTimeout(window._sysexLoadTimeout)
           return
         }
 
         const parsed = parseRequestDataSysexChunk(data)
-        if (!parsed) return
-        if (parsed.totalChunks !== SAVE_DATA_CHUNK_COUNT) {
-          console.warn(
-            'REQUEST_DATA chunk totalChunks inesperado:',
-            parsed.totalChunks,
-            '(se esperaba',
-            SAVE_DATA_CHUNK_COUNT + ')'
-          )
+        if (!parsed) {
+          console.warn('Chunk missed parsing valids. Length:', data.length)
+          return
         }
+        
+        console.log(`Received chunk ${parsed.chunkIndex + 1}/${parsed.totalChunks}. Payload length: ${parsed.payload.length}`)
+        
         requestDataChunkMap.set(parsed.chunkIndex, parsed.payload)
         receiveProgressRef.current.setCount(requestDataChunkMap.size)
 
-        const total = parsed.totalChunks
+        const total = SAVE_DATA_CHUNK_COUNT // force to expect our defined chunks
+
+        if (window._sysexLoadTimeout) clearTimeout(window._sysexLoadTimeout)
+        window._sysexLoadTimeout = setTimeout(() => {
+          if (requestDataChunkMap.size > 0 && requestDataChunkMap.size < total) {
+            console.warn('Timeout! Assembling payload with missing chunks...')
+            const merged = mergeRequestDataChunkPayloads(requestDataChunkMap, total)
+            requestDataChunkMap.clear()
+            receiveProgressRef.current.close()
+            if (merged) applyDevicePayload572(merged)
+          }
+        }, 1500)
+
         if (requestDataChunkMap.size < total) return
         for (let i = 0; i < total; i++) {
           if (!requestDataChunkMap.has(i)) return
         }
 
+        if (window._sysexLoadTimeout) clearTimeout(window._sysexLoadTimeout)
+
         const merged = mergeRequestDataChunkPayloads(requestDataChunkMap, total)
         if (!merged) {
-          console.warn('No se pudo ensamblar REQUEST_DATA en 570 bytes.')
+          console.warn('No se pudo ensamblar REQUEST_DATA en 572 bytes.')
           return
         }
         requestDataChunkMap.clear()
         receiveProgressRef.current.close()
-        applyDevicePayload570(merged)
+        applyDevicePayload572(merged)
       }
       break
     }
@@ -354,11 +372,11 @@ export const Interface = () => {
     openPedalInfo(pedal)
   }
 
-  const sendSaveDataPayload570InChunks = useCallback(
-    async (payload570, { onComplete } = {}) => {
+  const sendSaveDataPayloadInChunks = useCallback(
+    async (payloadData, { onComplete } = {}) => {
       if (!midiOutput) return false
-      if (payload570.length !== SAVE_DATA_PAYLOAD_LENGTH) {
-        console.error('SAVE_DATA payload length:', payload570.length, 'expected', SAVE_DATA_PAYLOAD_LENGTH)
+      if (payloadData.length !== SAVE_DATA_PAYLOAD_LENGTH) {
+        console.error('SAVE_DATA payload length:', payloadData.length, 'expected', SAVE_DATA_PAYLOAD_LENGTH)
         return false
       }
       const session = ++saveDataSendSessionRef.current
@@ -371,7 +389,7 @@ export const Interface = () => {
         if (session !== saveDataSendSessionRef.current) return false
         if (!midiOutput || midiOutput.state !== 'connected') return false
         try {
-          const chunk = buildSaveDataChunkSysex(payload570, i)
+          const chunk = buildSaveDataChunkSysex(payloadData, i)
           sendSysexRequest(midiOutput, chunk)
           setSendProgressSent(i + 1)
         } catch (error) {
@@ -402,15 +420,16 @@ export const Interface = () => {
     if (warnIfDisconnected()) return
     const banksFlat = Array.from(banksData)
     const presetsFlat = presetsData.flat(2)
-    const payload570 = [...banksFlat, ...presetsFlat]
-    if (payload570.length !== SAVE_DATA_PAYLOAD_LENGTH) {
-      console.error('SAVE_DATA payload length:', payload570.length, 'expected', SAVE_DATA_PAYLOAD_LENGTH)
+    const expressionFlat = Array.from(expressionData)
+    const payloadData = [...banksFlat, ...presetsFlat, ...expressionFlat]
+    if (payloadData.length !== SAVE_DATA_PAYLOAD_LENGTH) {
+      console.error('SAVE_DATA payload length:', payloadData.length, 'expected', SAVE_DATA_PAYLOAD_LENGTH)
       return
     }
     setSendProgressTitleKey('progress.titleSendingProgram')
     setSendProgressSent(0)
     setSendProgressOpen(true)
-    void sendSaveDataPayload570InChunks(payload570, {
+    void sendSaveDataPayloadInChunks(payloadData, {
       onComplete: () => {
         setSendProgressOpen(false)
         setSendSuccessOpen(true)
@@ -426,15 +445,16 @@ export const Interface = () => {
     if (warnIfDisconnected()) return
     const factoryBanksFlat = [...BANK_TYPES]
     const factoryPresetsFlat = FACTORY_SETTINGS.flat(2)
-    const payload570 = [...factoryBanksFlat, ...factoryPresetsFlat]
-    if (payload570.length !== SAVE_DATA_PAYLOAD_LENGTH) {
-      console.error('SAVE_DATA payload length:', payload570.length, 'expected', SAVE_DATA_PAYLOAD_LENGTH)
+    const factoryExpressionFlat = [...EXPRESSION_SETTINGS]
+    const payloadData = [...factoryBanksFlat, ...factoryPresetsFlat, ...factoryExpressionFlat]
+    if (payloadData.length !== SAVE_DATA_PAYLOAD_LENGTH) {
+      console.error('SAVE_DATA payload length:', payloadData.length, 'expected', SAVE_DATA_PAYLOAD_LENGTH)
       return
     }
     setSendProgressTitleKey('progress.titleSendingFactory')
     setSendProgressSent(0)
     setSendProgressOpen(true)
-    void sendSaveDataPayload570InChunks(payload570, {
+    void sendSaveDataPayloadInChunks(payloadData, {
       onComplete: () => {
         setSendProgressOpen(false)
         setSendSuccessOpen(true)
@@ -518,6 +538,15 @@ export const Interface = () => {
               }}
             >
               {t('interface.setBanks')}
+            </button>
+            <button
+              className='bank-button'
+              onClick={() => {
+                if (warnIfDisconnected()) return
+                setIsExpressionOpen(true)
+              }}
+            >
+              {t('interface.expression')}
             </button>
             <button className='bank-button' onClick={onProgramButtonClick}>
               {t('interface.program')}
@@ -728,6 +757,11 @@ export const Interface = () => {
         onClose={() => setIsBankTypeOpen(false)}
         bankTypes={bankTypes}
         setBankTypes={setBankTypes}
+      />
+
+      <ExpressionPopup
+        isOpen={isExpressionOpen}
+        onClose={() => setIsExpressionOpen(false)}
       />
 
       <DeviceDisconnectedPopup

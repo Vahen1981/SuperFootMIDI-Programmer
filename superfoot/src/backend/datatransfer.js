@@ -1,5 +1,4 @@
-import { FACTORY_SETTINGS } from '../data/factory.js'
-import { BANK_TYPES } from '../data/factory.js'
+import { FACTORY_SETTINGS, BANK_TYPES, EXPRESSION_SETTINGS } from '../data/factory.js'
 
 //Flujo de datos
 //1. La app se inicia y chequea si el dispositivo esta conectado, si no lo esta no se inicia
@@ -17,3 +16,4 @@ import { BANK_TYPES } from '../data/factory.js'
 
 export const banksData = [...BANK_TYPES]
 export const presetsData = JSON.parse(JSON.stringify(FACTORY_SETTINGS))
+export const expressionData = [...EXPRESSION_SETTINGS]

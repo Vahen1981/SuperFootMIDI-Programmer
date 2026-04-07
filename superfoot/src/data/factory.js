@@ -111,3 +111,5 @@ export const FACTORY_SETTINGS = [
         [0x09, 0x00, 0x04, 0x23, 0x3E, 0x42, 0x47], //Pedal H → Bm
     ]
 ];
+
+export const EXPRESSION_SETTINGS = [0x00, 0x07];

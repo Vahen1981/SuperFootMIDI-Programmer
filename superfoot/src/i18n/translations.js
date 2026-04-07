@@ -86,7 +86,12 @@ export const translations = {
     "progress.descReceive": "Loading configuration from the device. Data may arrive in several messages; the bar shows how many fragments have been received.",
     "progress.warnDisconnect": "Important: do not unplug the cable or disconnect the device until this finishes—the transfer may fail or stay incomplete.",
     "progress.labelSent": "{current} of {total} packets sent ({pct}%)",
-    "progress.labelReceived": "{current} of {total} packets received ({pct}%)"
+    "progress.labelReceived": "{current} of {total} packets received ({pct}%)",
+
+    // Expression
+    "interface.expression": "Expression Pedal",
+    "expression.title": "Expression Pedal",
+    "expression.ccNumber": "CC#"
   },
   es: {
     // Interface buttons & status
@@ -175,6 +180,11 @@ export const translations = {
     "progress.descReceive": "Cargando la configuración desde el dispositivo. Los datos pueden llegar en varios mensajes; la barra indica cuántos fragmentos se han recibido.",
     "progress.warnDisconnect": "Importante: no desconecte el cable ni desenchufe el dispositivo hasta que termine esta operación; la transferencia puede fallar o quedar incompleta.",
     "progress.labelSent": "{current} de {total} paquetes enviados ({pct}%)",
-    "progress.labelReceived": "{current} de {total} paquetes recibidos ({pct}%)"
+    "progress.labelReceived": "{current} de {total} paquetes recibidos ({pct}%)",
+
+    // Expression
+    "interface.expression": "Pedal de Expresión",
+    "expression.title": "Pedal de Expresión",
+    "expression.ccNumber": "CC#"
   }
 };
