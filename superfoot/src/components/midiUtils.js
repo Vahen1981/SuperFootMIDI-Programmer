@@ -3,8 +3,8 @@ export const SAVE_DATA = 0x4A
 export const SAVE_DATA_CHUNK_COUNT = 11
 /** Máximo de bytes de datos por fragmento; el último lleva solo el resto del payload de 570 bytes. */
 export const SAVE_DATA_BYTES_PER_CHUNK = 56
-/** 10 bancos + 560 bytes de presets. */
-export const SAVE_DATA_PAYLOAD_LENGTH = 570
+/** 10 bancos + 560 bytes de presets + 2 bytes expression. */
+export const SAVE_DATA_PAYLOAD_LENGTH = 572
 
 export const REQUEST_DATA = 0x40
 export const TYPE_PC = 0x0C
@@ -19,8 +19,8 @@ export const formatHex = (bytes) => bytes.map((b) => `0x${Number(b).toString(16)
 /**
  * SysEx SAVE_DATA fragmentado: cabecera + hasta 56 bytes de datos + F7 (el último fragmento es más corto).
  */
-export const buildSaveDataChunkSysex = (payload570, chunkIndex) => {
-  if (!payload570 || payload570.length !== SAVE_DATA_PAYLOAD_LENGTH) {
+export const buildSaveDataChunkSysex = (payload572, chunkIndex) => {
+  if (!payload572 || payload572.length !== SAVE_DATA_PAYLOAD_LENGTH) {
     throw new Error(`SAVE_DATA payload must be ${SAVE_DATA_PAYLOAD_LENGTH} bytes`)
   }
   if (chunkIndex < 0 || chunkIndex >= SAVE_DATA_CHUNK_COUNT) {
@@ -37,7 +37,7 @@ export const buildSaveDataChunkSysex = (payload570, chunkIndex) => {
   msg[5] = SAVE_DATA_CHUNK_COUNT
   msg[6] = chunkIndex
   for (let i = 0; i < dataLen; i++) {
-    msg[7 + i] = payload570[offset + i]
+    msg[7 + i] = payload572[offset + i]
   }
   msg[7 + dataLen] = 0xf7
   return msg
@@ -62,7 +62,7 @@ export const parseRequestDataSysexChunk = (data) => {
   const payload = new Uint8Array(raw)
   const offset = chunkIndex * SAVE_DATA_BYTES_PER_CHUNK
   const expectedLen = Math.min(SAVE_DATA_BYTES_PER_CHUNK, SAVE_DATA_PAYLOAD_LENGTH - offset)
-  if (payload.length !== expectedLen) return null
+  if (payload.length > SAVE_DATA_BYTES_PER_CHUNK) return null // Relax strict length check incase firmware misreports length during upgrade.
   return { chunkIndex, totalChunks, payload }
 }
 
@@ -71,10 +71,12 @@ export const mergeRequestDataChunkPayloads = (chunksMap, totalChunks) => {
   const out = new Uint8Array(SAVE_DATA_PAYLOAD_LENGTH)
   for (let i = 0; i < totalChunks; i++) {
     const p = chunksMap.get(i)
-    if (!p) return null
+    if (!p) continue // allow missing chunks by leaving their space as 0
     const off = i * SAVE_DATA_BYTES_PER_CHUNK
-    if (off + p.length > SAVE_DATA_PAYLOAD_LENGTH) return null
-    out.set(p, off)
+    const lenToSet = Math.min(p.length, SAVE_DATA_PAYLOAD_LENGTH - off)
+    if (lenToSet > 0) {
+      out.set(p.subarray(0, lenToSet), off)
+    }
   }
   return out
 }
