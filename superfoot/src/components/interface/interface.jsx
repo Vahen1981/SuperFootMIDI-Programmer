@@ -11,6 +11,7 @@ import { SendProgressPopup } from '../popups/SendProgressPopup.jsx'
 import { ExpressionPopup } from '../popups/ExpressionPopup.jsx'
 import { banksData, presetsData, expressionData } from '../../backend/datatransfer'
 import logo from '../../assets/logo.png'
+import logowhite from '../../assets/logo-white.png'
 import ledRojo from '../../assets/ledRojo.png'
 import ledVerde from '../../assets/ledVerde.png'
 import {
@@ -518,7 +519,7 @@ export const Interface = () => {
   if (isMobile && !isLandscape) {
     return (
       <div className="rotate-warning">
-        <img src={logo} className="rotate-warning-logo" alt="SuperFootMIDI" />
+        <img src={logowhite} className="rotate-warning-logo" alt="SuperFootMIDI" />
         <h2 className="rotate-warning-text">Por favor gire su teléfono para poder visualizar bien la app</h2>
         <div className="rotate-phone-icon"></div>
       </div>
