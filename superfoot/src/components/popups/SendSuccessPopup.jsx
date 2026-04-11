@@ -1,6 +1,6 @@
 import './banktype.css'
 import './confirmPopups.css'
-import { useLanguage } from '../context/LanguageContext.jsx'
+import { useLanguage } from '../../context/LanguageContext.jsx'
 
 export const SendSuccessPopup = ({ isOpen, onAccept }) => {
   const { t } = useLanguage()

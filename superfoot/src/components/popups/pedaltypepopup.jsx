@@ -5,11 +5,11 @@ import { CcPopup } from './CcPopup'
 import { CcLatchPopup } from './CcLatchPopup'
 import { MultiplesCcLatchPopup } from './MultiplesCcLatchPopup'
 import { NotesPopup } from './NotesPopup'
-import { useLanguage } from '../context/LanguageContext.jsx'
+import { useLanguage } from '../../context/LanguageContext.jsx'
 
 export const PedalTypePopup = (props) => {
   const { t } = useLanguage()
-  const { type, isOpen, onClose } = props
+  const { type, isOpen } = props
   const [warningOpen, setWarningOpen] = useState(false)
   const [hideWarningChecked, setHideWarningChecked] = useState(false)
   const hideWarningId = useId()

@@ -61,7 +61,7 @@ export const parseRequestDataSysexChunk = (data) => {
       : Uint8Array.from(Array.prototype.slice.call(data, 7, len - 1))
   const payload = new Uint8Array(raw)
   const offset = chunkIndex * SAVE_DATA_BYTES_PER_CHUNK
-  const expectedLen = Math.min(SAVE_DATA_BYTES_PER_CHUNK, SAVE_DATA_PAYLOAD_LENGTH - offset)
+  
   if (payload.length > SAVE_DATA_BYTES_PER_CHUNK) return null // Relax strict length check incase firmware misreports length during upgrade.
   return { chunkIndex, totalChunks, payload }
 }

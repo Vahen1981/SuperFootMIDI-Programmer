@@ -1,5 +1,5 @@
 import './banktype.css'
-import { useLanguage } from '../context/LanguageContext.jsx'
+import { useLanguage } from '../../context/LanguageContext.jsx'
 
 export const DeviceDisconnectedPopup = ({ isOpen, onAccept }) => {
   const { t } = useLanguage()

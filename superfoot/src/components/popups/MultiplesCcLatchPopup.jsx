@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import './banktype.css'
-import { SAVE_DATA, TYPE_CC, GREEN_PEDALS, LATCH, sendSysexRequest } from './midiUtils'
-import { presetsData } from '../backend/datatransfer'
-import { useLanguage } from '../context/LanguageContext.jsx'
+import { SAVE_DATA, TYPE_CC, GREEN_PEDALS, LATCH, sendSysexRequest } from '../midi/midiUtils'
+import { presetsData } from '../../backend/datatransfer'
+import { useLanguage } from '../../context/LanguageContext.jsx'
 
 export const MultiplesCcLatchPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput, onSetWarning }) => {
   const { t } = useLanguage()

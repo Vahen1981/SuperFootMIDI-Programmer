@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import './banktype.css'
-import { banksData, presetsData } from '../backend/datatransfer.js'
+import { banksData, presetsData } from '../../backend/datatransfer.js'
 import {
   PC_BANK_TEMP,
   CC_LATCH_BANK_TEMP,
   CC_MULTI_BANK_TEMP,
   CC_NON_LATCH_BANK_TEMP,
   NOTES_BANK_TEMP
-} from '../data/BankTemp.js'
-import { useLanguage } from '../context/LanguageContext.jsx'
+} from '../../data/BankTemp.js'
+import { useLanguage } from '../../context/LanguageContext.jsx'
 
 const options = [
   'Program Change (Presets control)',

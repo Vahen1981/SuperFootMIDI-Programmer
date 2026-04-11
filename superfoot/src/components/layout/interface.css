@@ -1,0 +1,303 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  /* opcional pero recomendado */
+}
+
+:root {
+  /* --width: 1419px; */
+  --width: calc((100vw / 4) * 2.8);
+  background-color: black;
+}
+
+.main-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.header {
+  width: var(--width);
+  margin-top: calc(var(--width) * 0.013);
+  height: calc(var(--width) * 0.15);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 calc(var(--width) * 0.013);
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: 'Mouse Memoirs', cursive;
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-image {
+  height: calc(var(--width) * 0.15);
+  width: auto;
+  object-fit: contain;
+}
+
+.buttons-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+}
+
+.language-button {
+  width: calc(var(--width) * 0.08);
+  height: calc(var(--width) * 0.03);
+  background: rgba(255, 0, 0, 0.507);
+  color: rgb(255, 255, 255);
+  border: 1px solid rgba(255, 181, 181, 0.23);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  font-family: "Urbanist", sans-serif;
+  font-size: calc(var(--width) * 0.011);
+  font-weight: 800;
+  margin: calc(var(--width) * 0.004) calc(var(--width) * 0.008);
+}
+
+.bank-button {
+  width: calc(var(--width) * 0.15);
+  height: calc(var(--width) * 0.03);
+  background: rgba(255, 181, 181, 0.23);
+  color: white;
+  border: 1px solid rgba(255, 181, 181, 0.23);
+  border-radius: calc(var(--width) * 0.009);
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  font-family: "Urbanist", sans-serif;
+  font-size: calc(var(--width) * 0.011);
+  font-weight: 800;
+  margin: calc(var(--width) * 0.004) calc(var(--width) * 0.008);
+}
+
+.bank-button:hover {
+  background: rgba(255, 255, 255, 0.35);
+  transform: translateY(-1px);
+}
+
+.language-button:hover {
+  background: rgba(255, 255, 255, 0.35);
+  transform: translateY(-1px);
+}
+
+.header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 100%;
+  width: 300px;
+  padding-top: calc(var(--width) * 0.040);
+  gap: calc(var(--width) * 0.005);
+}
+
+.device-status {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--width) * 0.005);
+}
+
+.status-text {
+  color: #ffffff;
+  font-family: "Urbanist", sans-serif;
+  font-size: calc(var(--width) * 0.016);
+  font-weight: 400;
+}
+
+.status-led {
+  width: calc(var(--width) * 0.03);
+  height: calc(var(--width) * 0.03);
+  object-fit: contain;
+}
+
+#superfoot-img-container {
+  position: relative;
+  width: var(--width);
+  height: calc(var(--width) / 2);
+  background-image: url('../../assets/superfoot-body.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin: 0 auto;
+  padding: 0;
+  z-index: 0;
+}
+
+.led-hidden {
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+}
+
+.led-visible {
+  opacity: 1;
+  transition: opacity 0.15s ease-in-out;
+}
+
+.pedals-top,
+.pedals-bottom {
+  cursor: pointer;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.12s ease-in-out;
+}
+
+.pedal-hidden {
+  opacity: 0;
+}
+
+.pedal-visible {
+  opacity: 1;
+}
+
+/* ========================================= */
+/*       PORTRAIT WARNING SCREEN             */
+/* ========================================= */
+.rotate-warning {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000;
+  color: #fff;
+  text-align: center;
+  padding: 20px;
+}
+
+.rotate-warning-logo {
+  width: 60%;
+  max-width: 250px;
+  height: auto;
+  margin-bottom: 30px;
+}
+
+.rotate-warning-text {
+  font-family: 'Urbanist', sans-serif;
+  font-size: 1.5rem;
+  margin-bottom: 30px;
+  max-width: 300px;
+}
+
+.rotate-phone-icon {
+  width: 60px;
+  height: 100px;
+  border: 4px solid white;
+  border-radius: 10px;
+  position: relative;
+  animation: rotatePhone 2s infinite ease-in-out;
+}
+
+.rotate-phone-icon::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 15px;
+  height: 15px;
+  background: white;
+  border-radius: 50%;
+}
+
+@keyframes rotatePhone {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  50% {
+    transform: rotate(-90deg);
+  }
+
+  100% {
+    transform: rotate(-90deg);
+  }
+}
+
+/* ========================================= */
+/*           MOBILE LANDSCAPE MODE           */
+/* ========================================= */
+.main-container.mobile-mode {
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  /* El ancho de referencia en celular bajara un poco para encajar todo */
+  --width: 75vw;
+  /* border: solid 1px green; */
+}
+
+.main-container.mobile-mode .header {
+  flex-direction: column;
+  width: 20vw;
+  height: calc(80vw / 2);
+  box-shadow: none;
+  margin: 0;
+  padding: 0;
+  padding-left: 10px;
+  justify-content: center;
+  align-items: flex-start;
+  /* border: solid 1px blue; */
+}
+
+.main-container.mobile-mode .header-right {
+  width: 100%;
+  padding-top: 0;
+  align-items: flex-start;
+  /* border: solid 1px yellow; */
+  justify-content: flex-start;
+}
+
+.main-container.mobile-mode .buttons-container {
+  flex-direction: column;
+  align-items: flex-start;
+  /* border: solid 1px red; */
+  width: 100%;
+}
+
+.main-container.mobile-mode .bank-button {
+  width: 90%;
+  height: 25px;
+  font-size: 0.5rem;
+  margin: 5px 0;
+}
+
+.main-container.mobile-mode .language-button {
+  width: 40%;
+  height: 20px;
+  font-size: 0.5rem;
+  margin: 5px 0;
+}
+
+.main-container.mobile-mode .logo-image {
+  height: auto;
+  width: 100%;
+  max-width: 120px;
+  /* border: solid 1px green; */
+}
+
+
+
+.main-container.mobile-mode .device-status {
+  /* border: solid 1px green; */
+}
+
+.main-container.mobile-mode .status-text {
+  font-size: 0.5rem;
+}
+
+.main-container.mobile-mode .status-led {
+  width: 15px;
+  height: 15px;
+}

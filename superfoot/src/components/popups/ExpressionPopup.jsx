@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import './banktype.css'
-import { expressionData } from '../backend/datatransfer'
-import { useLanguage } from '../context/LanguageContext.jsx'
+import { expressionData } from '../../backend/datatransfer'
+import { useLanguage } from '../../context/LanguageContext.jsx'
 
 export const ExpressionPopup = ({ isOpen, onClose }) => {
   const { t } = useLanguage()
