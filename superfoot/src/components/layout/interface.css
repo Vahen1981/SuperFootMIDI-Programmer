@@ -8,7 +8,17 @@
 :root {
   /* --width: 1419px; */
   --width: calc((100vw / 4) * 2.8);
-  background-color: black;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-image: url('../../assets/wood-background2.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  min-height: 100vh;
 }
 
 .main-container {
@@ -62,12 +72,13 @@
   font-size: calc(var(--width) * 0.011);
   font-weight: 800;
   margin: calc(var(--width) * 0.004) calc(var(--width) * 0.008);
+  filter: drop-shadow(-5px 5px 5px rgba(0, 0, 0, 0.938));
 }
 
 .bank-button {
   width: calc(var(--width) * 0.15);
   height: calc(var(--width) * 0.03);
-  background: rgba(255, 181, 181, 0.23);
+  background: rgba(22, 0, 0, 0.603);
   color: white;
   border: 1px solid rgba(255, 181, 181, 0.23);
   border-radius: calc(var(--width) * 0.009);
@@ -77,6 +88,7 @@
   font-size: calc(var(--width) * 0.011);
   font-weight: 800;
   margin: calc(var(--width) * 0.004) calc(var(--width) * 0.008);
+  filter: drop-shadow(-5px 5px 5px rgba(0, 0, 0, 0.938));
 }
 
 .bank-button:hover {
@@ -130,6 +142,7 @@
   margin: 0 auto;
   padding: 0;
   z-index: 0;
+  filter: drop-shadow(-30px 15px 15px rgba(0, 0, 0, 0.938));
 }
 
 .led-hidden {
