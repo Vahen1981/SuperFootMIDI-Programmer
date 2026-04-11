@@ -1,14 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import './interface.css'
-import './leds.css'
-import './pedals.css'
-import { BankType } from '../banktype.jsx'
-import { PedalTypePopup } from '../pedaltypepopup.jsx'
-import { DeviceDisconnectedPopup } from '../DeviceDisconnectedPopup.jsx'
-import { ConfirmDeviceWritePopup } from '../ConfirmDeviceWritePopup.jsx'
-import { SendSuccessPopup } from '../SendSuccessPopup.jsx'
-import { SendProgressPopup } from '../SendProgressPopup.jsx'
-import { ExpressionPopup } from '../ExpressionPopup.jsx'
+import '../layout/interface.css'
+import '../layout/leds.css'
+import '../layout/pedals.css'
+import { BankType } from '../popups/banktype.jsx'
+import { PedalTypePopup } from '../popups/pedaltypepopup.jsx'
+import { DeviceDisconnectedPopup } from '../popups/DeviceDisconnectedPopup.jsx'
+import { ConfirmDeviceWritePopup } from '../popups/ConfirmDeviceWritePopup.jsx'
+import { SendSuccessPopup } from '../popups/SendSuccessPopup.jsx'
+import { SendProgressPopup } from '../popups/SendProgressPopup.jsx'
+import { ExpressionPopup } from '../popups/ExpressionPopup.jsx'
 import { banksData, presetsData, expressionData } from '../../backend/datatransfer'
 import logo from '../../assets/logo.png'
 import ledRojo from '../../assets/ledRojo.png'
@@ -21,9 +21,11 @@ import {
   mergeRequestDataChunkPayloads,
   parseRequestDataSysexChunk,
   sendSysexRequest,
-} from '../midiUtils.js'
+} from '../midi/midiUtils.js'
 import { BANK_TYPES, FACTORY_SETTINGS, EXPRESSION_SETTINGS } from '../../data/factory.js'
 import { useLanguage } from '../../context/LanguageContext.jsx'
+import { useDeviceDetect } from '../../hooks/useDeviceDetect.js'
+
 
 const SAVE_DATA_CHUNK_INTERVAL_MS = 500
 
@@ -50,6 +52,7 @@ const clearSuperFootInputListeners = (midiAccess) => {
 
 export const Interface = () => {
   const { t, language, toggleLanguage } = useLanguage()
+  const { isMobile, isLandscape } = useDeviceDetect()
   const [activeGreen, setActiveGreen] = useState(null)
   const [counter, setCounter] = useState(0)
   const [upPressed, setUpPressed] = useState(false)
@@ -282,7 +285,7 @@ export const Interface = () => {
         ) {
           requestDataChunkMap.clear()
           receiveProgressRef.current.setCount(SAVE_DATA_CHUNK_COUNT)
-          receiveProgressRef.current.close()
+
           applyDevicePayload572(new Uint8Array(data.subarray(5, 5 + SAVE_DATA_PAYLOAD_LENGTH)))
           if (window._sysexLoadTimeout) clearTimeout(window._sysexLoadTimeout)
           return
@@ -477,40 +480,53 @@ export const Interface = () => {
     setCounter((value) => (value + 1) % 10)
     setActiveGreen(null)
   }
-
   const prevCounter = () => {
     setCounter((value) => (value + 9) % 10)
     setActiveGreen(null)
   }
 
-  const onUpDownStart = () => {
+  const onUpDownStart = (e) => {
+    if (e && e.cancelable) e.preventDefault()
     if (warnIfDisconnected()) return
     setUpPressed(true)
     onPedalPress('Up')
     nextCounter()
   }
 
-  const onUpDownEnd = () => {
+  const onUpDownEnd = (e) => {
+    if (e && e.cancelable) e.preventDefault()
     setUpPressed(false)
     onPedalRelease()
   }
 
-  const onDownDownStart = () => {
+  const onDownDownStart = (e) => {
+    if (e && e.cancelable) e.preventDefault()
     if (warnIfDisconnected()) return
     setDownPressed(true)
     onPedalPress('Dwn')
     prevCounter()
   }
 
-  const onDownDownEnd = () => {
+  const onDownDownEnd = (e) => {
+    if (e && e.cancelable) e.preventDefault()
     setDownPressed(false)
     onPedalRelease()
   }
 
   const currentBlue = counter + 1 // 0 => led1, 9 => led10
 
+  if (isMobile && !isLandscape) {
+    return (
+      <div className="rotate-warning">
+        <img src={logo} className="rotate-warning-logo" alt="SuperFootMIDI" />
+        <h2 className="rotate-warning-text">Por favor gire su teléfono para poder visualizar bien la app</h2>
+        <div className="rotate-phone-icon"></div>
+      </div>
+    )
+  }
+
   return (
-    <div className='main-container'>
+    <div className={`main-container ${(isMobile && isLandscape) ? 'mobile-mode' : ''}`}>
       <div className='header'>
         
         <div className='header-logo'>

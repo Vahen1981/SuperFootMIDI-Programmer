@@ -1,7 +1,7 @@
 import { useState, useEffect, useId } from 'react'
 import './banktype.css'
 import './confirmPopups.css'
-import { useLanguage } from '../context/LanguageContext.jsx'
+import { useLanguage } from '../../context/LanguageContext.jsx'
 
 export const ConfirmDeviceWritePopup = ({
   isOpen,

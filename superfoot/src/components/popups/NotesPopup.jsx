@@ -1,9 +1,9 @@
 import { useState, useEffect, useId } from 'react'
 import './banktype.css'
-import { SAVE_DATA, TYPE_NOTE, GREEN_PEDALS, sendSysexRequest } from './midiUtils'
-import { presetsData } from '../backend/datatransfer'
-import { calculateChord, detectChord } from '../backend/chordcalculator.js'
-import { useLanguage } from '../context/LanguageContext.jsx'
+import { SAVE_DATA, TYPE_NOTE, GREEN_PEDALS, sendSysexRequest } from '../midi/midiUtils'
+import { presetsData } from '../../backend/datatransfer'
+import { calculateChord, detectChord } from '../../backend/chordcalculator.js'
+import { useLanguage } from '../../context/LanguageContext.jsx'
 
 export const NotesPopup = ({ isOpen, onClose, pedal, bank, type, midiOutput, onSetWarning }) => {
   const { t } = useLanguage()
