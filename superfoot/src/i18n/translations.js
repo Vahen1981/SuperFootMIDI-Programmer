@@ -51,11 +51,20 @@ export const translations = {
     "banktype.accept": "Accept",
     "banktype.cancel": "Cancel",
 
-    // Device Disconnect
+    // Device Disconnect & Selection
     "disconnect.title": "Device Disconnected",
     "disconnect.desc": "SuperFoot MIDI is not connected or powered off.",
     "disconnect.action": "Please connect the device and refresh the page if it doesn't automatically reconnect.",
     "disconnect.statusRetry": "Waiting for device...",
+    
+    "selectDevice.title": "Select SuperFoot MIDI Device",
+    "selectDevice.desc": "SuperFoot MIDI could not be automatically detected. Please select the MIDI interface to which it is connected via DIN cable.",
+    "selectDevice.inputLabel": "MIDI Input:",
+    "selectDevice.outputLabel": "MIDI Output:",
+    "selectDevice.select": "Select Port...",
+    "selectDevice.connect": "Connect",
+    "selectDevice.cancel": "Cancel",
+    "selectDevice.noDevices": "No MIDI devices found.",
     
     // Confirm Write
     "write.title": "Temporary Changes Applied",
@@ -145,11 +154,20 @@ export const translations = {
     "banktype.accept": "Aceptar",
     "banktype.cancel": "Cancelar",
 
-    // Device Disconnect
+    // Device Disconnect & Selection
     "disconnect.title": "Dispositivo Desconectado",
     "disconnect.desc": "SuperFoot MIDI no está conectado o está apagado.",
     "disconnect.action": "Por favor, conecta el dispositivo y actualiza la página si no se reconecta automáticamente.",
     "disconnect.statusRetry": "Esperando al dispositivo...",
+
+    "selectDevice.title": "Seleccionar Dispositivo SuperFoot MIDI",
+    "selectDevice.desc": "No se pudo detectar automáticamente SuperFoot MIDI. Por favor seleccione la interfaz MIDI a la cual está conectada a través del cable DIN.",
+    "selectDevice.inputLabel": "Entrada MIDI:",
+    "selectDevice.outputLabel": "Salida MIDI:",
+    "selectDevice.select": "Seleccionar Puerto...",
+    "selectDevice.connect": "Conectar",
+    "selectDevice.cancel": "Cancelar",
+    "selectDevice.noDevices": "No se encontraron dispositivos MIDI.",
     
     // Confirm Write
     "write.title": "Cambios Temporales Aplicados",
