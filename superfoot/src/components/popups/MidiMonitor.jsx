@@ -28,19 +28,28 @@ export const MidiMonitor = ({ isOpen, onClose, midiInput }) => {
 
       const status = data[0]
 
+      const getNoteName = (midiNote) => {
+        if (midiNote < 0 || midiNote > 127) return midiNote
+        const notesStr = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+        const octsStr = ['-2', '-1', '0', '1', '2', '3', '4', '5', '6', '7', '8'] // MIDI goes up to 127, which is G9.
+        const noteIndex = midiNote % 12
+        const octIndex = Math.floor(midiNote / 12)
+        return `${notesStr[noteIndex]}${octsStr[octIndex] || ''}`
+      }
+
       if (status >= 0x80 && status <= 0x8F) {
         type = 'Note Off'
         channel = (status & 0x0F) + 1
-        number = data[1]
+        number = getNoteName(data[1])
         value = data[2]
         typeClass = 'type-note-off'
       } else if (status >= 0x90 && status <= 0x9F) {
         type = data[2] === 0 ? 'Note Off' : 'Note On'
         channel = (status & 0x0F) + 1
-        number = data[1]
+        number = getNoteName(data[1])
         value = data[2]
         typeClass = data[2] === 0 ? 'type-note-off' : 'type-note-on'
-      } else if (status >= 0xB0 && status <= 0xBF) {
+      } else if (status >= 0xb0 && status <= 0xbf) {
         type = 'CC'
         channel = (status & 0x0F) + 1
         number = data[1]
