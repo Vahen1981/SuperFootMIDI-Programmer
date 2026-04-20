@@ -115,7 +115,7 @@ export const translations = {
     "monitor.time": "Time",
     "monitor.type": "Type",
     "monitor.channel": "CH",
-    "monitor.number": "CC/Note#",
+    "monitor.number": "PC/CC/Note",
     "monitor.value": "Value",
     "monitor.hex": "HEX Message"
   },
@@ -235,7 +235,7 @@ export const translations = {
     "monitor.time": "Tiempo",
     "monitor.type": "Tipo",
     "monitor.channel": "CH",
-    "monitor.number": "CC/Nota#",
+    "monitor.number": "PC/CC/Note",
     "monitor.value": "Valor",
     "monitor.hex": "Mensaje HEX"
   }
