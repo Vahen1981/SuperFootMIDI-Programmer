@@ -292,6 +292,9 @@ export const Interface = () => {
         if (session !== sysexSessionRef.current) return
         const data = event.data
 
+        // Ignore non-Sysex messages (e.g. Active Sense 0xFE, Clock 0xF8, etc.)
+        if (data.length < 3 || data[0] < 0xF0) return
+
         if (
           data.length === 578 &&
           data[0] === 0xf0 &&
