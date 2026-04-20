@@ -1,0 +1,158 @@
+.midimonitor-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.midimonitor-popup {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 900px;
+  height: 90vh;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  color: #fff;
+}
+
+.midimonitor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 12px;
+}
+
+.midimonitor-header h2 {
+  flex: 1;
+  margin: 0;
+  font-size: 32px;
+  font-weight: 600;
+  color: #00ffcc;
+  letter-spacing: 1px;
+  font-family: 'Mouse Memoirs', cursive;
+  text-align: center;
+  padding-left: 140px; /* Offset to compensate for buttons on the right and keep it truly centered */
+}
+
+.midimonitor-actions {
+  display: flex;
+  gap: 12px;
+  width: 140px;
+  justify-content: flex-end;
+}
+
+.monitor-btn {
+  background: #333;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  font-family: 'Roboto', sans-serif;
+}
+
+.monitor-btn:hover {
+  background: #444;
+}
+
+.monitor-btn.clear {
+  background: #c0392b;
+}
+
+.monitor-btn.clear:hover {
+  background: #e74c3c;
+}
+
+.midimonitor-content {
+  flex: 1;
+  overflow-y: auto;
+  background: #000;
+  border-radius: 8px;
+  padding: 0;
+  border: 1px solid #222;
+}
+
+.monitor-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.85rem;
+}
+
+.monitor-table th {
+  position: sticky;
+  top: 0;
+  background: #111;
+  color: #888;
+  text-align: left;
+  padding: 10px;
+  font-weight: 600;
+  border-bottom: 1px solid #333;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+.monitor-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #111;
+  vertical-align: middle;
+}
+
+.monitor-row {
+  transition: background 0.1s;
+}
+
+.monitor-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Specialty colors for types */
+.type-note-on { color: #2ecc71; font-weight: bold; }
+.type-note-off { color: #e74c3c; font-weight: bold; }
+.type-cc { color: #3498db; font-weight: bold; }
+.type-pc { color: #f1c40f; font-weight: bold; }
+.type-sysex { color: #9b59b6; font-style: italic; }
+.type-other { color: #95a5a6; }
+
+.cell-time { color: #666; width: 120px; }
+.cell-type { width: 100px; }
+.cell-channel { color: #aaa; width: 40px; text-align: center; }
+.cell-num { color: #eee; width: 100px; text-align: center; }
+.cell-val { color: #eee; width: 60px; text-align: center; }
+.cell-hex { color: #555; font-size: 0.8rem; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Custom Scrollbar */
+.midimonitor-content::-webkit-scrollbar {
+  width: 8px;
+}
+.midimonitor-content::-webkit-scrollbar-track {
+  background: #000;
+}
+.midimonitor-content::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+.midimonitor-content::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}

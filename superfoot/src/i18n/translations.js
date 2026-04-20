@@ -51,11 +51,20 @@ export const translations = {
     "banktype.accept": "Accept",
     "banktype.cancel": "Cancel",
 
-    // Device Disconnect
+    // Device Disconnect & Selection
     "disconnect.title": "Device Disconnected",
     "disconnect.desc": "SuperFoot MIDI is not connected or powered off.",
     "disconnect.action": "Please connect the device and refresh the page if it doesn't automatically reconnect.",
     "disconnect.statusRetry": "Waiting for device...",
+    
+    "selectDevice.title": "Select SuperFoot MIDI Device",
+    "selectDevice.desc": "SuperFoot MIDI could not be automatically detected. Please select the MIDI interface to which it is connected via DIN cable.",
+    "selectDevice.inputLabel": "MIDI Input:",
+    "selectDevice.outputLabel": "MIDI Output:",
+    "selectDevice.select": "Select Port...",
+    "selectDevice.connect": "Connect",
+    "selectDevice.cancel": "Cancel",
+    "selectDevice.noDevices": "No MIDI devices found.",
     
     // Confirm Write
     "write.title": "Temporary Changes Applied",
@@ -91,7 +100,24 @@ export const translations = {
     // Expression
     "interface.expression": "Expression Pedal",
     "expression.title": "Expression Pedal",
-    "expression.ccNumber": "CC#"
+    "expression.ccNumber": "CC#",
+    "expression.calibrateBtn": "Calibrate Pedal",
+    "expression.calibTitle": "Calibration Instructions",
+    "expression.calibStep1": "Bring the expression pedal to its lowest position, once ready press pedal A",
+    "expression.calibStep2": "Then bring the pedal to its highest position, once ready press pedal A. Calibration will be finished.",
+    "expression.calibCancel": "During any moment you can press pedal B to cancel",
+    "expression.calibClose": "Close",
+
+    // MIDI Monitor
+    "interface.midiMonitor": "MIDI Monitor",
+    "monitor.title": "MIDI Monitor",
+    "monitor.clear": "Clear",
+    "monitor.time": "Time",
+    "monitor.type": "Type",
+    "monitor.channel": "CH",
+    "monitor.number": "PC/CC/Note",
+    "monitor.value": "Value",
+    "monitor.hex": "HEX Message"
   },
   es: {
     // Interface buttons & status
@@ -145,11 +171,20 @@ export const translations = {
     "banktype.accept": "Aceptar",
     "banktype.cancel": "Cancelar",
 
-    // Device Disconnect
+    // Device Disconnect & Selection
     "disconnect.title": "Dispositivo Desconectado",
     "disconnect.desc": "SuperFoot MIDI no está conectado o está apagado.",
     "disconnect.action": "Por favor, conecta el dispositivo y actualiza la página si no se reconecta automáticamente.",
     "disconnect.statusRetry": "Esperando al dispositivo...",
+
+    "selectDevice.title": "Seleccionar Dispositivo SuperFoot MIDI",
+    "selectDevice.desc": "No se pudo detectar automáticamente SuperFoot MIDI. Por favor seleccione la interfaz MIDI a la cual está conectada a través del cable DIN.",
+    "selectDevice.inputLabel": "Entrada MIDI:",
+    "selectDevice.outputLabel": "Salida MIDI:",
+    "selectDevice.select": "Seleccionar Puerto...",
+    "selectDevice.connect": "Conectar",
+    "selectDevice.cancel": "Cancelar",
+    "selectDevice.noDevices": "No se encontraron dispositivos MIDI.",
     
     // Confirm Write
     "write.title": "Cambios Temporales Aplicados",
@@ -185,6 +220,23 @@ export const translations = {
     // Expression
     "interface.expression": "Pedal de Expresión",
     "expression.title": "Pedal de Expresión",
-    "expression.ccNumber": "CC#"
+    "expression.ccNumber": "CC#",
+    "expression.calibrateBtn": "Calibrar Pedal",
+    "expression.calibTitle": "Instrucciones de Calibración",
+    "expression.calibStep1": "Lleve el pedal de expresión hasta su posición más baja, una vez listo presione el pedal A.",
+    "expression.calibStep2": "Luego lleve el pedal a su posición más alta, una vez listo presione el pedal A. La calibración se habrá finalizado.",
+    "expression.calibCancel": "Durante cualquier momento puede presionar el pedal B para cancelar",
+    "expression.calibClose": "Cerrar",
+
+    // MIDI Monitor
+    "interface.midiMonitor": "Monitor MIDI",
+    "monitor.title": "Monitor MIDI",
+    "monitor.clear": "Limpiar",
+    "monitor.time": "Tiempo",
+    "monitor.type": "Tipo",
+    "monitor.channel": "CH",
+    "monitor.number": "PC/CC/Note",
+    "monitor.value": "Valor",
+    "monitor.hex": "Mensaje HEX"
   }
 };

@@ -4,11 +4,12 @@ import '../layout/leds.css'
 import '../layout/pedals.css'
 import { BankType } from '../popups/banktype.jsx'
 import { PedalTypePopup } from '../popups/pedaltypepopup.jsx'
-import { DeviceDisconnectedPopup } from '../popups/DeviceDisconnectedPopup.jsx'
+import { DeviceSelectionPopup } from '../popups/DeviceSelectionPopup.jsx'
 import { ConfirmDeviceWritePopup } from '../popups/ConfirmDeviceWritePopup.jsx'
 import { SendSuccessPopup } from '../popups/SendSuccessPopup.jsx'
 import { SendProgressPopup } from '../popups/SendProgressPopup.jsx'
 import { ExpressionPopup } from '../popups/ExpressionPopup.jsx'
+import { MidiMonitor } from '../popups/MidiMonitor.jsx'
 import { banksData, presetsData, expressionData } from '../../backend/datatransfer'
 import logo from '../../assets/logo.png'
 import logowhite from '../../assets/logo-white.png'
@@ -35,11 +36,13 @@ const SAVE_DATA_CHUNK_INTERVAL_MS = 500
 const USE_FACTORY_DATA = false // Change to true to use factory.js data instead of incoming SysEx
 const greenPedals = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
 
-const clearSuperFootInputListeners = (midiAccess) => {
+const clearSuperFootInputListeners = (midiAccess, customMidiInputId) => {
   if (!midiAccess) return
   try {
     for (const input of midiAccess.inputs.values()) {
-      if (!input.name || !input.name.toLowerCase().includes('superfoot midi')) continue
+      const isSuperFootName = input.name && input.name.toLowerCase().includes('superfoot midi')
+      const isCustomInput = customMidiInputId && input.id === customMidiInputId
+      if (!isSuperFootName && !isCustomInput) continue
       try {
         input.onmidimessage = null
       } catch {
@@ -61,6 +64,7 @@ export const Interface = () => {
   const [pressedPedal, setPressedPedal] = useState(null)
   const [isBankTypeOpen, setIsBankTypeOpen] = useState(false)
   const [isExpressionOpen, setIsExpressionOpen] = useState(false)
+  const [isMidiMonitorOpen, setIsMidiMonitorOpen] = useState(false)
 
   const bankTypeName = (code) => {
     switch (code) {
@@ -93,6 +97,8 @@ export const Interface = () => {
   const [sendProgressTitleKey, setSendProgressTitleKey] = useState('progress.titleSendingProgram')
   const [receiveProgressOpen, setReceiveProgressOpen] = useState(false)
   const [receiveProgressCount, setReceiveProgressCount] = useState(0)
+  const [customMidiInputId, setCustomMidiInputId] = useState('')
+  const [customMidiOutputId, setCustomMidiOutputId] = useState('')
   const initialDisconnectShownRef = useRef(false)
   const saveDataSendSessionRef = useRef(0)
   const receiveProgressRef = useRef({
@@ -112,20 +118,30 @@ export const Interface = () => {
   const [pedalInfoOpen, setPedalInfoOpen] = useState(false)
   const [selectedPedalInfo, setSelectedPedalInfo] = useState(null)
   const [midiOutput, setMidiOutput] = useState(null)
+  const [midiInput, setMidiInput] = useState(null)
 
   const midiAccessRef = useRef(null)
   const sysexSessionRef = useRef(0)
 
-  const getSuperFootMidiOutput = (midiAccess) => {
+  const getSuperFootMidiOutput = useCallback((midiAccess) => {
+    if (customMidiOutputId) {
+      const output = midiAccess.outputs.get(customMidiOutputId)
+      if (output && output.state === 'connected') return output
+    }
     for (const output of midiAccess.outputs.values()) {
       if (!output.name || !output.name.toLowerCase().includes('superfoot midi')) continue
       if (output.state !== 'connected') continue
       return output
     }
     return null
-  }
+  }, [customMidiOutputId])
 
-  const isSuperFootMidiPresent = (midiAccess) => {
+  const isSuperFootMidiPresent = useCallback((midiAccess) => {
+    if (customMidiInputId && customMidiOutputId) {
+      const input = midiAccess.inputs.get(customMidiInputId)
+      const output = midiAccess.outputs.get(customMidiOutputId)
+      if (input?.state === 'connected' && output?.state === 'connected') return true
+    }
     for (const input of midiAccess.inputs.values()) {
       if (!input.name || !input.name.toLowerCase().includes('superfoot midi')) continue
       if (input.state === 'connected') return true
@@ -135,18 +151,18 @@ export const Interface = () => {
       if (output.state === 'connected') return true
     }
     return false
-  }
+  }, [customMidiInputId, customMidiOutputId])
 
   const scanMidiDevices = useCallback((midiAccess) => {
     const output = getSuperFootMidiOutput(midiAccess)
     const found = isSuperFootMidiPresent(midiAccess)
     const online = !!found
     if (!output) {
-      clearSuperFootInputListeners(midiAccess)
+      clearSuperFootInputListeners(midiAccess, customMidiInputId)
     }
     setIsDeviceOnline((prev) => (prev === online ? prev : online))
     setMidiOutput((prev) => (prev === output ? prev : output))
-  }, [])
+  }, [getSuperFootMidiOutput, isSuperFootMidiPresent, customMidiInputId])
 
   useEffect(() => {
     let cancelled = false
@@ -242,7 +258,7 @@ export const Interface = () => {
     if (!midiAccess) return
 
     const session = ++sysexSessionRef.current
-    let midiInput = null
+    let foundInput = null
     const requestDataChunkMap = new Map()
 
     const applyDevicePayload572 = (payload) => {
@@ -270,12 +286,17 @@ export const Interface = () => {
     }
 
     for (const input of midiAccess.inputs.values()) {
-      if (!input.name || !input.name.toLowerCase().includes('superfoot midi')) continue
+      const isSuperFootName = input.name && input.name.toLowerCase().includes('superfoot midi')
+      const isCustomInput = customMidiInputId && input.id === customMidiInputId
+      if (!isSuperFootName && !isCustomInput) continue
       if (input.state !== 'connected') continue
-      midiInput = input
+      foundInput = input
       input.onmidimessage = (event) => {
         if (session !== sysexSessionRef.current) return
         const data = event.data
+
+        // Ignore non-Sysex messages (e.g. Active Sense 0xFE, Clock 0xF8, etc.)
+        if (data.length < 3 || data[0] < 0xF0) return
 
         if (
           data.length === 578 &&
@@ -332,6 +353,7 @@ export const Interface = () => {
         receiveProgressRef.current.close()
         applyDevicePayload572(merged)
       }
+      setMidiInput(foundInput)
       break
     }
 
@@ -356,12 +378,16 @@ export const Interface = () => {
       sysexSessionRef.current++
       receiveProgressRef.current.close()
       try {
-        if (midiInput) midiInput.onmidimessage = null
+        if (foundInput) foundInput.onmidimessage = null
       } catch {
         /* ignore */
       }
     }
-  }, [midiOutput, isDeviceOnline, deviceDataSyncKey])
+  }, [midiOutput, isDeviceOnline, deviceDataSyncKey, customMidiInputId])
+
+  useEffect(() => {
+    if (!isDeviceOnline) setMidiInput(null)
+  }, [isDeviceOnline])
 
   const setGreenPedal = (led) => {
     setActiveGreen(led)
@@ -571,6 +597,9 @@ export const Interface = () => {
             <button className='bank-button' onClick={onFactoryButtonClick}>
               {t('interface.factory')}
             </button>
+            <button className='bank-button' onClick={() => setIsMidiMonitorOpen(true)}>
+              {t('interface.midiMonitor')}
+            </button>
           </div>
         </div>
       </div>
@@ -779,11 +808,25 @@ export const Interface = () => {
       <ExpressionPopup
         isOpen={isExpressionOpen}
         onClose={() => setIsExpressionOpen(false)}
+        midiOutput={midiOutput}
       />
 
-      <DeviceDisconnectedPopup
+      <DeviceSelectionPopup
         isOpen={disconnectWarningOpen}
-        onAccept={() => setDisconnectWarningOpen(false)}
+        midiAccess={midiAccessRef.current}
+        onConnect={(inputId, outputId) => {
+          setCustomMidiInputId(inputId)
+          setCustomMidiOutputId(outputId)
+          setDisconnectWarningOpen(false)
+          if (midiAccessRef.current) {
+             const output = midiAccessRef.current.outputs.get(outputId)
+             const input = midiAccessRef.current.inputs.get(inputId)
+             const online = output?.state === 'connected' && input?.state === 'connected'
+             setIsDeviceOnline(online)
+             setMidiOutput(output || null)
+          }
+        }}
+        onCancel={() => setDisconnectWarningOpen(false)}
       />
 
       <ConfirmDeviceWritePopup
@@ -819,6 +862,12 @@ export const Interface = () => {
       />
 
       <SendSuccessPopup isOpen={sendSuccessOpen} onAccept={() => setSendSuccessOpen(false)} />
+
+      <MidiMonitor
+        isOpen={isMidiMonitorOpen}
+        onClose={() => setIsMidiMonitorOpen(false)}
+        midiInput={midiInput}
+      />
     </div>
   )
 }
