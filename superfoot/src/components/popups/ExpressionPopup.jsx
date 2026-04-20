@@ -108,14 +108,13 @@ export const ExpressionPopup = ({ isOpen, onClose, midiOutput }) => {
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: '30px' }}>
-          <button style={{ width: '100%', padding: '10px', borderRadius: '8px', backgroundColor: '#d15e21', color: 'white' }} onClick={handleCalibrate}>
-            {t('expression.calibrateBtn')}
-          </button>
+
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '12px', gap: '12px' }}>
-          <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={onClose}>{t('popup.close')}</button>
           <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={handleSet}>{t('popup.set')}</button>
+          <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={handleCalibrate}>{t('expression.calibrateBtn')}</button>
+          <button style={{ flex: 1, padding: '10px', borderRadius: '8px' }} onClick={onClose}>{t('popup.close')}</button>
         </div>
         </>
         )}
