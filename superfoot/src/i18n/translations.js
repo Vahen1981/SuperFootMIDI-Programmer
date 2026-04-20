@@ -106,7 +106,18 @@ export const translations = {
     "expression.calibStep1": "Bring the expression pedal to its lowest position, once ready press pedal A",
     "expression.calibStep2": "Then bring the pedal to its highest position, once ready press pedal A. Calibration will be finished.",
     "expression.calibCancel": "During any moment you can press pedal B to cancel",
-    "expression.calibClose": "Close"
+    "expression.calibClose": "Close",
+
+    // MIDI Monitor
+    "interface.midiMonitor": "MIDI Monitor",
+    "monitor.title": "MIDI Monitor",
+    "monitor.clear": "Clear",
+    "monitor.time": "Time",
+    "monitor.type": "Type",
+    "monitor.channel": "CH",
+    "monitor.number": "CC/Note#",
+    "monitor.value": "Value",
+    "monitor.hex": "HEX Message"
   },
   es: {
     // Interface buttons & status
@@ -215,6 +226,17 @@ export const translations = {
     "expression.calibStep1": "Lleve el pedal de expresión hasta su posición más baja, una vez listo presione el pedal A.",
     "expression.calibStep2": "Luego lleve el pedal a su posición más alta, una vez listo presione el pedal A. La calibración se habrá finalizado.",
     "expression.calibCancel": "Durante cualquier momento puede presionar el pedal B para cancelar",
-    "expression.calibClose": "Cerrar"
+    "expression.calibClose": "Cerrar",
+
+    // MIDI Monitor
+    "interface.midiMonitor": "Monitor MIDI",
+    "monitor.title": "Monitor MIDI",
+    "monitor.clear": "Limpiar",
+    "monitor.time": "Tiempo",
+    "monitor.type": "Tipo",
+    "monitor.channel": "CH",
+    "monitor.number": "CC/Nota#",
+    "monitor.value": "Valor",
+    "monitor.hex": "Mensaje HEX"
   }
 };

@@ -9,6 +9,7 @@ import { ConfirmDeviceWritePopup } from '../popups/ConfirmDeviceWritePopup.jsx'
 import { SendSuccessPopup } from '../popups/SendSuccessPopup.jsx'
 import { SendProgressPopup } from '../popups/SendProgressPopup.jsx'
 import { ExpressionPopup } from '../popups/ExpressionPopup.jsx'
+import { MidiMonitor } from '../popups/MidiMonitor.jsx'
 import { banksData, presetsData, expressionData } from '../../backend/datatransfer'
 import logo from '../../assets/logo.png'
 import logowhite from '../../assets/logo-white.png'
@@ -63,6 +64,7 @@ export const Interface = () => {
   const [pressedPedal, setPressedPedal] = useState(null)
   const [isBankTypeOpen, setIsBankTypeOpen] = useState(false)
   const [isExpressionOpen, setIsExpressionOpen] = useState(false)
+  const [isMidiMonitorOpen, setIsMidiMonitorOpen] = useState(false)
 
   const bankTypeName = (code) => {
     switch (code) {
@@ -116,6 +118,7 @@ export const Interface = () => {
   const [pedalInfoOpen, setPedalInfoOpen] = useState(false)
   const [selectedPedalInfo, setSelectedPedalInfo] = useState(null)
   const [midiOutput, setMidiOutput] = useState(null)
+  const [midiInput, setMidiInput] = useState(null)
 
   const midiAccessRef = useRef(null)
   const sysexSessionRef = useRef(0)
@@ -255,7 +258,7 @@ export const Interface = () => {
     if (!midiAccess) return
 
     const session = ++sysexSessionRef.current
-    let midiInput = null
+    let foundInput = null
     const requestDataChunkMap = new Map()
 
     const applyDevicePayload572 = (payload) => {
@@ -287,7 +290,7 @@ export const Interface = () => {
       const isCustomInput = customMidiInputId && input.id === customMidiInputId
       if (!isSuperFootName && !isCustomInput) continue
       if (input.state !== 'connected') continue
-      midiInput = input
+      foundInput = input
       input.onmidimessage = (event) => {
         if (session !== sysexSessionRef.current) return
         const data = event.data
@@ -350,6 +353,7 @@ export const Interface = () => {
         receiveProgressRef.current.close()
         applyDevicePayload572(merged)
       }
+      setMidiInput(foundInput)
       break
     }
 
@@ -374,12 +378,16 @@ export const Interface = () => {
       sysexSessionRef.current++
       receiveProgressRef.current.close()
       try {
-        if (midiInput) midiInput.onmidimessage = null
+        if (foundInput) foundInput.onmidimessage = null
       } catch {
         /* ignore */
       }
     }
   }, [midiOutput, isDeviceOnline, deviceDataSyncKey, customMidiInputId])
+
+  useEffect(() => {
+    if (!isDeviceOnline) setMidiInput(null)
+  }, [isDeviceOnline])
 
   const setGreenPedal = (led) => {
     setActiveGreen(led)
@@ -588,6 +596,9 @@ export const Interface = () => {
             </button>
             <button className='bank-button' onClick={onFactoryButtonClick}>
               {t('interface.factory')}
+            </button>
+            <button className='bank-button' onClick={() => setIsMidiMonitorOpen(true)}>
+              {t('interface.midiMonitor')}
             </button>
           </div>
         </div>
@@ -851,6 +862,12 @@ export const Interface = () => {
       />
 
       <SendSuccessPopup isOpen={sendSuccessOpen} onAccept={() => setSendSuccessOpen(false)} />
+
+      <MidiMonitor
+        isOpen={isMidiMonitorOpen}
+        onClose={() => setIsMidiMonitorOpen(false)}
+        midiInput={midiInput}
+      />
     </div>
   )
 }
