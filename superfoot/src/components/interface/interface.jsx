@@ -794,6 +794,7 @@ export const Interface = () => {
       <ExpressionPopup
         isOpen={isExpressionOpen}
         onClose={() => setIsExpressionOpen(false)}
+        midiOutput={midiOutput}
       />
 
       <DeviceSelectionPopup

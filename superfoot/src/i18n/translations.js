@@ -100,7 +100,13 @@ export const translations = {
     // Expression
     "interface.expression": "Expression Pedal",
     "expression.title": "Expression Pedal",
-    "expression.ccNumber": "CC#"
+    "expression.ccNumber": "CC#",
+    "expression.calibrateBtn": "Calibrate Pedal",
+    "expression.calibTitle": "Calibration Instructions",
+    "expression.calibStep1": "Bring the expression pedal to its lowest position, once ready press pedal A",
+    "expression.calibStep2": "Then bring the pedal to its highest position, once ready press pedal A. Calibration will be finished.",
+    "expression.calibCancel": "During any moment you can press pedal B to cancel",
+    "expression.calibClose": "Close"
   },
   es: {
     // Interface buttons & status
@@ -203,6 +209,12 @@ export const translations = {
     // Expression
     "interface.expression": "Pedal de Expresión",
     "expression.title": "Pedal de Expresión",
-    "expression.ccNumber": "CC#"
+    "expression.ccNumber": "CC#",
+    "expression.calibrateBtn": "Calibrar Pedal",
+    "expression.calibTitle": "Instrucciones de Calibración",
+    "expression.calibStep1": "Lleve el pedal de expresión hasta su posición más baja, una vez listo presione el pedal A.",
+    "expression.calibStep2": "Luego lleve el pedal a su posición más alta, una vez listo presione el pedal A. La calibración se habrá finalizado.",
+    "expression.calibCancel": "Durante cualquier momento puede presionar el pedal B para cancelar",
+    "expression.calibClose": "Cerrar"
   }
 };
